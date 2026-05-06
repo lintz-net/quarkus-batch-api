@@ -1,0 +1,2519 @@
+      *----------------------------------------------------------------*
+      * ATENCAO-ATENCAO-ATENCAO-ATENCAO-ATENCAO-ATENCAO-ATENCAO-ATENCAO*
+      *----------------------------------------------------------------*
+      *  COMPILAR ESTE PROGRAMA COBOL LE - SUBROT - ONLINE E BATCH     *
+      *  TYPE ==>  CLENAL01  -  OPCAO 10                               *
+      *----------------------------------------------------------------*
+      * ATENCAO-ATENCAO-ATENCAO-ATENCAO-ATENCAO-ATENCAO-ATENCAO-ATENCAO*
+      *----------------------------------------------------------------*
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.  RUCBBDIA.
+       AUTHOR.   PATRICIA HORTENZI.
+      ******************************************************************
+      *----------------------------------------------------------------*
+      *    SISTEMA   :  ROTINAS DE USO COMUM                           *
+      *----------------------------------------------------------------*
+      *    PROGRAMA  :  RUCBBDIA                                       *
+      *----------------------------------------------------------------*
+      *    DESCRICAO :  ROTINA PARA CALCULO DE DIGITO VERIFICADOR      *
+      *----------------------------------------------------------------*
+      *    AUTORA    :  PATRICIA HORTENZI       DATA : 25/06/2001      *
+      *----------------------------------------------------------------*
+      *    HISTORICO DE ALTERACOES                                     *
+      *----------------------------------------------------------------*
+      *    ANALISTA  :  CARLOS ANDRE D'AVILA                           *
+      *    DATA      :  18 / 09 / 2001                                 *
+      *    VERSAO    :  002                                            *
+      *    MOTIVO    :  CALCULO DO DV PARA CARTOES MAESTRO(MASTERCARD)*
+      *                 E O DV DO NUMERO DE REMESSA REGISTRADA DO COR- *
+      *                 REIO (AR).                                     *
+      *----------------------------------------------------------------*
+      *    ANALISTA  :  PATRICIA HORTENZI                              *
+      *    DATA      :  18 / 10 / 2001                                 *
+      *    VERSAO    :  003                                            *
+      *    MOTIVO    :  CALCULO DO DV MODULO 11 GENERICO COM DV PARA   *
+      *                 RESTO ZERO DIFERENCIADO                        *
+      *----------------------------------------------------------------*
+      *    ANALISTA  :  PATRICIA HORTENZI                              *
+      *    DATA      :  21 / 05 / 2002                                 *
+      *    VERSAO    :  004                                            *
+      *    MOTIVO    :  CALCULO DO DV DE CATOES DE CREDITO CONSTRUCARD *
+      *----------------------------------------------------------------*
+      *    ANALISTA  :  PATRICIA HORTENZI                              *
+      *    DATA      :  29 / 07 / 2003                                 *
+      *    VERSAO    :  005                                            *
+      *    MOTIVO    :  CALCULO DE DV GENERICO COM 45 POSICOES         *
+      *----------------------------------------------------------------*
+      *    ANALISTA  :  PATRICIA HORTENZI                              *
+      *    DATA      :  18 / 12 / 2003                                 *
+      *    VERSAO    :  006                                            *
+      *    MOTIVO    :  ALTERACAO NO CALCULO DO MODULO 1129            *
+      *----------------------------------------------------------------*
+      *    ANALISTA  :  PATRICIA HORTENZI                              *
+      *    DATA      :  14 / 10 / 2004                                 *
+      *    VERSAO    :  007                                            *
+      *    MOTIVO    :  INCLUSAO CALCULO DE DV DE CARTAO VISAELECTRON  *
+      *----------------------------------------------------------------*
+      *    ANALISTA  :  GERSON MAURO                                   *
+      *    DATA      :  21 / 02 / 2005                                 *
+      *    VERSAO    :  008                                            *
+      *    MOTIVO    :  AJUSTE NO CALCULO DO DIGITO OPCAO 23           *
+      *----------------------------------------------------------------*
+      *    ANALISTA  :  GERSON MAURO                                   *
+      *    DATA      :  11 / 05 / 2006                                 *
+      *    VERSAO    :  009                                            *
+      *    MOTIVO    :  AJUSTE NO CALCULO DO DIGITO OPCAO 19           *
+      *----------------------------------------------------------------*
+      *    ANALISTA  :  GERSON MAURO                                   *
+      *    DATA      :  11 / 06 / 2007                                 *
+      *    VERSAO    :  010                                            *
+      *    MOTIVO    :  INCLUSAO DO CALCULO DO DIGITO MODULO 11        *
+      *              :  CONVENIO 200400 LIGHT. SICOV                   *
+      *----------------------------------------------------------------*
+      *    ANALISTA  :  GERSON MAURO                                   *
+      *    DATA      :  21 / 06 / 2007                                 *
+      *    VERSAO    :  010                                            *
+      *    MOTIVO    :  INCLUSAO DO CALCULO DO DIGITO MODULO 11        *
+      *              :  CONVENIO 901853 SEFAZ/SP PPI                   *
+      *----------------------------------------------------------------*
+      *    ANALISTA  :  CARLOS ANDRE D'AVILA / AMADEU MARASSI          *
+      *    DATA      :  10 / 02 / 2010                                 *
+      *    VERSAO    :  011                                            *
+      *    MOTIVO    :  CALCULO DO VISA ELECTRON DE 16 POSI«’ES        *
+      *                 ( 15 + DV ), CONFORME SOLICITACAO DA REDEASP68 *
+      *----------------------------------------------------------------*
+      *    ANALISTA  :  GERSON MAURO                                   *
+      *    DATA      :  16 / 03 / 2010                                 *
+      *    VERSAO    :  012                                            *
+      *    MOTIVO    :  CALCULO DO DIGITO PARA NOVA CONTA CORRENTE     *
+      *                 ( 11 + DV ), CONFORME SOLICITACAO DA REDEASP16 *
+      *                 EM ATENDIMENTO AO NSGD.                        *
+      *                 AJUSTES DA VERSAO ANTERIOR (POR CARLOS ANDRE). *
+      *----------------------------------------------------------------*
+      *    ANALISTA  :  GERSON MAURO                                   *
+      *    DATA      :  21 / 06 / 2012                                 *
+      *    VERSAO    :  013                                            *
+      *    MOTIVO    :  AJUSTAR A ROTINA 120-DV-CONSTRUCARD PARA       *
+      *              :  POSSIBILITAR A VALIDA«√O DO C”DIGO DE OPERA«√O *
+      *              :  168 (PRODUTO MOVEISCARD).                      *
+      *----------------------------------------------------------------*
+      **   ANALISTA  :  GERSON MAURO                                   *
+      **   DATA      :  28 / 02 / 2013                                 *
+      **   VERSAO    :  014                                            *
+      **   MOTIVO    :  CRIAR NOVA ROTINA PARA CALCULO DO DV GENERICO  *
+      **             :  MOD. 11 PARA BOLETOS DA JUSTICA (43 - POSI«’ES)*
+      **---------------------------------------------------------------*
+      **   ANALISTA  :  GERSON MAURO                                   *
+      **   DATA      :  20 / 03 / 2013                                 *
+      **   VERSAO    :  015                                            *
+      **   MOTIVO    :  INCLUSAO DO CALCULO DO DIGITO MODULO 11        *
+      **             :  CONVENIO 901853 SEFAZ/SP PPI - NOVO CALCULO    *
+      **---------------------------------------------------------------*
+      **   ANALISTA  :  GERSON MAURO                                   *
+      **   DATA      :  12 / 04 / 2013                                 *
+      **   VERSAO    :  016                                            *
+      **   MOTIVO    :  INCLUSAO DO CALCULO DO DIGITO MODULO 10        *
+      **             :  PARA PARTES DO CODIGO DE BARRAS DE 43 POSI«’ES *
+      **---------------------------------------------------------------*
+      **   ANALISTA  :  MARCO FUZARO                                   *
+      **   DATA      :  25 / 04 / 2014                                 *
+      **   VERSAO    :  017                                            *
+      **   MOTIVO    :  PASSA A PREVER BIN ELLO D…BITO INICIADO EM 5   *
+      **---------------------------------------------------------------*
+      **   ANALISTA  :  MARCO FUZARO                                   *
+      **   DATA      :  20 / 06 / 2014                                 *
+      **   VERSAO    :  018                                            *
+      **   MOTIVO    :  PASSA A CALCULAR DV DE EVENTO DO SINAF NOVO    *
+      **                (EVENTO CONT¡BIL COM 5 DÕGITOS)                *
+      **---------------------------------------------------------------*
+      **   ANALISTA  :  GLOBALWEB                                      *
+      **   DATA      :  28 / 01 / 2015                                 *
+      **   VERSAO    :  019                                            *
+      *    MOTIVO    :  CALCULO DA NOVA BANDEIRA DE CARTAO DE CREDITO  *
+      *              :  JCB COM 16 POSICOES (15 + DV) MODULO 10 "DOUBLE*
+      *              :  DOUBLE" FORMULA LUHN                           *
+      **---------------------------------------------------------------*
+      **   ANALISTA  :  STEFANINI / CARLOS GONDO                       *
+      **   DATA      :  03 / 04 / 2025                                 *
+      **   VERSAO    :  020                                            *
+      *    MOTIVO    :  CALCULO DO CNPJ ALFANUMERICO                   *
+      **---------------------------------------------------------------*
+      **   ANALISTA  :  STEFANINI / CARLOS GONDO                       *
+      **   DATA      :  24 / 02 / 2025                                 *
+      **   VERSAO    :  021                                            *
+      *    MOTIVO    :  CONSISTENCIA DOS CAMPOS  PARA CNPJ ALFA        *
+      *                 SOMENTE LETRAS MAIUSCULAS E NUMEROS            *
+      *                 RETURN CODE = 9 CARACTERES INVALIDOS CNPJ AJFA *
+      **---------------------------------------------------------------*
+      ******************************************************************
+       ENVIRONMENT DIVISION.
+       CONFIGURATION          SECTION.
+       SPECIAL-NAMES.
+                 DECIMAL-POINT IS COMMA.
+       DATA DIVISION.
+      *----------------------------------------------------------------*
+       WORKING-STORAGE SECTION.
+      *----------------------------------------------------------------*
+      *
+       01  FILLER.
+         03  FILLER                         PIC X(080) VALUE
+           'RUCBBDIG BY PATRICIA HORTENZI - VERSAO 007 14/10/2004'.
+      *
+         03  WS-TIPO-CARTAO                 PIC 9(001) VALUE ZEROS.
+      *
+         03  WS-CALC-CONSTRUCARD            PIC 9(004)V99 VALUE ZEROS.  ZEROS.
+      *
+         03  FILLER   REDEFINES   WS-CALC-CONSTRUCARD.
+           05  FILLER                       PIC X(004).
+           05  WS-DIGITO-CONSTRUCARD        PIC 9(001).
+           05  FILLER                       PIC X(001).
+      *
+         03  WS-SOMA                        PIC S9(015) COMP-3
+                                                        VALUE ZEROS.
+      *
+         03  WS-SOMA-ALFA                   PIC S9(015) COMP-3
+                                                        VALUE ZEROS.
+      *
+         03  WS-RESTO                       PIC 9(002) VALUE ZEROS.
+      *
+         03  WS-NUMERICO                    PIC X(001).
+           88  WS-VALUE-NUMERICO            VALUES ARE '0' THROUGH '9'.
+      *
+         03  WS-IND-PESO                    PIC 9(003) VALUE ZEROS.
+      *
+         03  WS-IND                         PIC S9(003) COMP-3
+                                                       VALUE ZEROS.
+         03  WS-IND1                        PIC S9(07) COMP-3
+                                                       VALUE ZEROS.
+         03  WS-IND2                        PIC S9(07) COMP-3
+                                                       VALUE ZEROS.
+      *
+         03  WS-DIGITOS.
+           05  WS-DIGITO-1                  PIC 9(001) VALUE ZEROS.
+           05  WS-DIGITO-2                  PIC 9(001) VALUE ZEROS.
+      *
+         03  WS-DIGITO                      REDEFINES WS-DIGITOS
+                                            PIC 9(002).
+      *
+         03  WS-CALC-INVER                  PIC 9(018) VALUE ZEROS.
+      *
+         03  WS-CALCULO                     PIC 9(018) VALUE ZEROS.
+         03  FILLER                         REDEFINES WS-CALCULO.
+           05  WS-NUMERO     OCCURS 018     PIC 9(001).
+      *
+         03  WS-CALCULO-ALFA                PIC X(018) VALUE SPACES.
+         03  FILLER                         REDEFINES WS-CALCULO-ALFA.
+           05  WS-NUMERO-ALFA   OCCURS 018     PIC X(001).
+      *
+         03  WS-CALCULO-AUX                 OCCURS 45.
+           05  WS-DUAS-CASAS                PIC 9(002).
+           05  FILLER                       REDEFINES WS-DUAS-CASAS.
+             10  WS-CASA-1                  PIC 9(001).
+             10  WS-CASA-2                  PIC 9(001).
+      *
+         03  WS-CALCULO-LONGO               PIC X(025).
+      *
+         03  FILLER                         REDEFINES WS-CALCULO-LONGO.
+           05  WS-DIG-LONGO  OCCURS 025     PIC 9(001).
+      *
+         03  WS-CALCULO-EXTENDIDO           PIC X(045).
+      *
+         03  FILLER                         REDEFINES
+                                              WS-CALCULO-EXTENDIDO.
+           05  WS-DIG-EX     OCCURS 045     PIC 9(001).
+VRS014*
+VRS014   03  WS-CALCULO-BOLETO43            PIC X(043).
+VRS014   03  FILLER          REDEFINES  WS-CALCULO-BOLETO43.
+VRS014     05  WS-DIG-43     OCCURS 043     PIC 9(001).
+VRS014
+VRS014   03  WS-DV-BOLETO-43                PIC 9(001) VALUE ZEROS.
+      *
+         03  WS-INAT-CALC                   PIC 9(002) VALUE ZEROS.
+      *
+         03  FILLER                         REDEFINES WS-INAT-CALC.
+           05  WS-INAT-1                    PIC 9(001).
+           05  WS-INAT-2                    PIC 9(001).
+
+      *
+         03  WS-RESTO-CEI                   PIC 9(003) VALUE ZEROS.
+      *
+         03  FILLER                         REDEFINES WS-RESTO-CEI.
+           05  FILLER                       PIC X(002).
+           05  WS-UNIDADE-CEI               PIC 9(001).
+      *
+         03  WS-SOMA-CEI                    PIC 9(003) VALUE ZEROS.
+      *
+         03  WS-ACUM-AUX-CEI.
+           05  WS-ACUM-CALC1-CEI            PIC 9(001) VALUE ZEROS.
+           05  WS-ACUM-CALC2-CEI            PIC 9(001) VALUE ZEROS.
+           05  WS-ACUM-CALC3-CEI            PIC 9(001) VALUE ZEROS.
+      *
+         03  WS-RESTO-DEBITO                PIC 9(003) VALUE ZEROS.
+      *
+         03  WS-PESO-DEBITO                 PIC 9(001) VALUE ZERO.
+      *
+         03  WS-PRODUTO-DEBITO              PIC 9(002) VALUE ZERO.
+      *
+         03  FILLER                        REDEFINES WS-PRODUTO-DEBITO.
+           05  WS-PROD1-DEBITO              PIC 9(001).
+           05  WS-PROD2-DEBITO              PIC 9(001).
+      *
+         03  WS-SOMA-DEBITO                 PIC 9(003) VALUE ZEROS.
+      *
+         03  FILLER                         REDEFINES WS-SOMA-DEBITO.
+           05  WS-ACUM-CALC1-DEBITO         PIC 9(001).
+           05  WS-ACUM-CALC2-DEBITO         PIC 9(001).
+           05  WS-ACUM-CALC3-DEBITO         PIC 9(001).
+      *
+         03  WS-PESO-EMPREGADO.
+           05  FILLER  PIC X(24) VALUE '654327654327654327654320'.
+           05  FILLER  PIC X(24) VALUE '276543276543270000654320'.
+           05  FILLER  PIC X(24) VALUE '327654000327654327654320'.
+           05  FILLER  PIC X(24) VALUE '543276000543270000654320'.
+           05  FILLER  PIC X(24) VALUE '765432765432765432765432'.
+           05  FILLER  PIC X(24) VALUE '327654327654320000765432'.
+           05  FILLER  PIC X(24) VALUE '432765000432765432765432'.
+           05  FILLER  PIC X(24) VALUE '654327000654320000765432'.
+      *
+         03  FILLER          REDEFINES WS-PESO-EMPREGADO  OCCURS 008.
+           05  WS-BYTE-PESO  OCCURS 024     PIC 9(001).
+      *
+         03  WS-CALC-JCB                    PIC 9(015) VALUE ZEROS.
+         03  FILLER                         REDEFINES WS-CALC-JCB.
+           05  WS-NU-JCB     OCCURS 015     PIC 9(001).
+      *
+         03  WS-SEPARA-JCB                  PIC 9(002) VALUE ZEROS.
+         03  FILLER                         REDEFINES WS-SEPARA-JCB.
+           05  WS-SE-JCB1                   PIC 9(001).
+           05  WS-SE-JCB2                   PIC 9(001).
+      *
+         03  WS-SEPARA-SOMA                 PIC 9(003) VALUE ZEROS.
+         03  FILLER                         REDEFINES WS-SEPARA-SOMA.
+           05  WS-SE-SOMA1                  PIC 9(001).
+           05  WS-SE-SOMA2                  PIC 9(001).
+           05  WS-SE-SOMA3                  PIC 9(001).
+      *
+         03  WS-DOBRO-JCB                   PIC 9(016) VALUE ZEROS.
+         03  FILLER                         REDEFINES WS-DOBRO-JCB.
+           05  WS-DB-JCB     OCCURS 08      PIC 9(002).
+      *
+         03  WS-SOMA-JCB                    PIC 9(003) VALUE ZEROS.
+      *
+         03  WS-DIGITO-JCB                  PIC 9(001) VALUE ZEROS.
+      *
+         03  WS-FIM-JCB                     PIC X(001) VALUE SPACES.
+      *
+         03   TABELA-ASCII.
+          05  FILLER  PIC X(03) VALUE '048'.
+          05  FILLER  PIC X(03) VALUE '149'.
+          05  FILLER  PIC X(03) VALUE '250'.
+          05  FILLER  PIC X(03) VALUE '351'.
+          05  FILLER  PIC X(03) VALUE '452'.
+          05  FILLER  PIC X(03) VALUE '553'.
+          05  FILLER  PIC X(03) VALUE '654'.
+          05  FILLER  PIC X(03) VALUE '755'.
+          05  FILLER  PIC X(03) VALUE '856'.
+          05  FILLER  PIC X(03) VALUE '957'.
+          05  FILLER  PIC X(03) VALUE 'A65'.
+          05  FILLER  PIC X(03) VALUE 'B66'.
+          05  FILLER  PIC X(03) VALUE 'C67'.
+          05  FILLER  PIC X(03) VALUE 'D68'.
+          05  FILLER  PIC X(03) VALUE 'E69'.
+          05  FILLER  PIC X(03) VALUE 'F70'.
+          05  FILLER  PIC X(03) VALUE 'G71'.
+          05  FILLER  PIC X(03) VALUE 'H72'.
+          05  FILLER  PIC X(03) VALUE 'I73'.
+          05  FILLER  PIC X(03) VALUE 'J74'.
+          05  FILLER  PIC X(03) VALUE 'K75'.
+          05  FILLER  PIC X(03) VALUE 'L76'.
+          05  FILLER  PIC X(03) VALUE 'M77'.
+          05  FILLER  PIC X(03) VALUE 'N78'.
+          05  FILLER  PIC X(03) VALUE 'O79'.
+          05  FILLER  PIC X(03) VALUE 'P80'.
+          05  FILLER  PIC X(03) VALUE 'Q81'.
+          05  FILLER  PIC X(03) VALUE 'R82'.
+          05  FILLER  PIC X(03) VALUE 'S83'.
+          05  FILLER  PIC X(03) VALUE 'T84'.
+          05  FILLER  PIC X(03) VALUE 'U85'.
+          05  FILLER  PIC X(03) VALUE 'V86'.
+          05  FILLER  PIC X(03) VALUE 'W87'.
+          05  FILLER  PIC X(03) VALUE 'X88'.
+          05  FILLER  PIC X(03) VALUE 'Y89'.
+          05  FILLER  PIC X(03) VALUE 'Z90'.
+      *
+         03   FILLER          REDEFINES TABELA-ASCII  OCCURS 036.
+           05 WS-ASCII       PIC X(001).
+           05 WS-ASCII-VALO  PIC 9(002).
+      *
+         03  WS-CH-CNPJ                     PIC 9(001) VALUE ZEROS.
+      *
+         03  WS-CNPJ-ALFANUMERICO           PIC X(001).
+           88  WS-CNPJ-ALFA                 VALUES ARE 'A' THROUGH 'Z'.
+           88  WS-CNPJ-NUM                  VALUES ARE '0' THROUGH '9'.
+
+      *----------------------------------------------------------------*
+       LINKAGE SECTION.
+      *----------------------------------------------------------------*
+      *
+           COPY   RUCWSDIG   REPLACING   ==:RUCWS:==   BY   ==RUCLS==.
+      *
+      *----------------------------------------------------------------*
+       PROCEDURE DIVISION USING RUCLSDIG.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       000-MODULO-PRINCIPAL SECTION.
+      *----------------------------------------------------------------*
+      *
+           MOVE   ZERO   TO   RUCLS-CODIGO-RETORNO
+      * ---------------------------------------------------
+           IF   RUCLS-ACAO   IS NOT   NUMERIC
+             MOVE   01   TO   RUCLS-CODIGO-RETORNO
+           ELSE
+             EVALUATE RUCLS-ACAO
+               WHEN 01
+                 PERFORM   101-DV-CONTA   THRU   101-FIM
+               WHEN 02
+                 PERFORM   102-DV-CPF   THRU   102-FIM
+               WHEN 03
+                 PERFORM   103-DV-CGC   THRU   103-FIM
+               WHEN 04
+                 PERFORM   104-DV-PONTO-VENDA   THRU   104-FIM
+               WHEN 05
+                 PERFORM   105-DV-PIS   THRU   105-FIM
+               WHEN 06
+                 PERFORM   106-DV-EMPRESA-FGTS THRU   106-FIM
+               WHEN 07
+                 PERFORM   107-DV-EMPREGADO    THRU   107-FIM
+               WHEN 08
+                 PERFORM   108-DV-CHEQUE   THRU   108-FIM
+               WHEN 09
+                 PERFORM   109-DV-INATIVA   THRU   109-FIM
+               WHEN 10
+                 PERFORM   110-DV-SIAPI   THRU   110-FIM
+               WHEN 11
+                 PERFORM   111-DV-EVENTO   THRU   111-FIM
+               WHEN 12
+                 PERFORM   112-DV-CEI   THRU   112-FIM
+               WHEN 13
+                 PERFORM   113-DV-BENEFICIO   THRU   113-FIM
+               WHEN 14
+                 PERFORM   114-DV-LOTERICO   THRU   114-FIM
+               WHEN 15
+                 PERFORM   115-DV-GENERICO   THRU   115-FIM
+               WHEN 16
+                 PERFORM   116-DV-DEBITO    THRU   116-FIM
+               WHEN 17
+                 PERFORM   117-DV-REMESSA   THRU   117-FIM
+               WHEN 18
+                 PERFORM   115-DV-GENERICO   THRU   115-FIM
+               WHEN 19
+                 PERFORM   119-DV-CARTAO     THRU   119-FIM
+               WHEN 20
+                 PERFORM   120-DV-CONSTRUCARD   THRU   120-FIM
+               WHEN 21
+                 PERFORM   121-DV-GENERICO-EX   THRU   121-FIM
+               WHEN 22
+                 PERFORM   121-DV-GENERICO-EX   THRU   121-FIM
+               WHEN 23
+                 PERFORM   121-DV-GENERICO-EX   THRU   121-FIM
+               WHEN  24
+                 PERFORM   124-DV-BOLETO-43     THRU    124-FIM
+               WHEN 25
+                 PERFORM   125-DV-IPTU          THRU   125-FIM
+               WHEN 26
+                 PERFORM   126-DV-LIGHT         THRU   126-FIM
+               WHEN 27
+                 PERFORM   127-DV-PARCELAMENTO-SEFAZ
+                                                THRU   127-FIM
+               WHEN 28
+                 PERFORM   128-DV-CONTA-NSGD    THRU   128-FIM
+               WHEN  29
+                 PERFORM    127-DV-PARCELAMENTO-SEFAZ
+                                                THRU   127-FIM
+               WHEN 30
+                 PERFORM    129-DV-PARTES-BOLETO43
+                                                THRU   129-FIM
+               WHEN 31
+                 PERFORM   131-DV-EVENTO-NOVO  THRU   131-FIM
+               WHEN 32
+                 PERFORM   132-DV-JCB   THRU   132-FIM
+
+               WHEN OTHER
+                 MOVE   05   TO   RUCLS-CODIGO-RETORNO
+             END-EVALUATE
+           END-IF.
+      *
+           GOBACK.
+      *
+      *----------------------------------------------------------------*
+       000-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       101-DV-CONTA.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-CONTA-CALCULO   IS NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           MOVE   RUCLS-CONTA   TO   WS-CALCULO.
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 08) +
+                  (WS-NUMERO(02) * 07) +
+                  (WS-NUMERO(03) * 06) +
+                  (WS-NUMERO(04) * 05) +
+                  (WS-NUMERO(05) * 04) +
+                  (WS-NUMERO(06) * 03) +
+                  (WS-NUMERO(07) * 02) +
+                  (WS-NUMERO(08) * 09) +
+                  (WS-NUMERO(09) * 08) +
+                  (WS-NUMERO(10) * 07) +
+                  (WS-NUMERO(11) * 06) +
+                  (WS-NUMERO(12) * 05) +
+                  (WS-NUMERO(13) * 04) +
+                  (WS-NUMERO(14) * 03) +
+                  (WS-NUMERO(15) * 02)).
+      *
+           DIVIDE  WS-SOMA     BY   11
+                   GIVING      WS-SOMA
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   RUCLS-DV-CONTA
+           ELSE
+             COMPUTE   RUCLS-DV-CONTA  =  11  -  WS-RESTO
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       101-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       102-DV-CPF.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-CPF   IS NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF.
+      *
+           MOVE   RUCLS-CPF   TO   WS-CALCULO
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 10) +
+                  (WS-NUMERO(02) * 09) +
+                  (WS-NUMERO(03) * 08) +
+                  (WS-NUMERO(04) * 07) +
+                  (WS-NUMERO(05) * 06) +
+                  (WS-NUMERO(06) * 05) +
+                  (WS-NUMERO(07) * 04) +
+                  (WS-NUMERO(08) * 03) +
+                  (WS-NUMERO(09) * 02)).
+      *
+           DIVIDE  WS-SOMA     BY   11
+                   GIVING      TALLY
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   WS-DIGITO-1
+           ELSE
+             COMPUTE   WS-DIGITO-1   =   11   -   WS-RESTO
+           END-IF.
+      *
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 11) +
+                  (WS-NUMERO(02) * 10) +
+                  (WS-NUMERO(03) * 09) +
+                  (WS-NUMERO(04) * 08) +
+                  (WS-NUMERO(05) * 07) +
+                  (WS-NUMERO(06) * 06) +
+                  (WS-NUMERO(07) * 05) +
+                  (WS-NUMERO(08) * 04) +
+                  (WS-NUMERO(09) * 03) +
+                  (WS-DIGITO-1   * 02)).
+      *
+           DIVIDE  WS-SOMA     BY   11
+                   GIVING      TALLY
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   WS-DIGITO-2
+           ELSE
+             COMPUTE   WS-DIGITO-2   =   11   -   WS-RESTO
+           END-IF.
+      *
+           MOVE   WS-DIGITO   TO   RUCLS-DV-CPF.
+      *
+      *----------------------------------------------------------------*
+       102-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       103-DV-CGC.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-CGC-CALCULO   IS NOT   NUMERIC
+		              PERFORM  103X0-CONS-ALFA  THRU 103X0-FIM
+                IF   WS-CH-CNPJ  EQUAL  ZEROS
+		                   PERFORM  103A-DV-CGC-ALFA THRU 103A-FIM
+                ELSE
+                     MOVE   09   TO   RUCLS-CODIGO-RETORNO
+                     PERFORM   900-ERROR
+                END-IF
+		         ELSE
+		              PERFORM  103N-DV-CGC-NUM THRU 103N-FIM
+           END-IF.
+		
+	      103-FIM.   EXIT.
+	
+      *----------------------------------------------------------------*
+       103N-DV-CGC-NUM.
+      *----------------------------------------------------------------*
+      *
+	
+           MOVE   RUCLS-CGC   TO   WS-CALCULO
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 05) +
+                  (WS-NUMERO(02) * 04) +
+                  (WS-NUMERO(03) * 03) +
+                  (WS-NUMERO(04) * 02) +
+                  (WS-NUMERO(05) * 09) +
+                  (WS-NUMERO(06) * 08) +
+                  (WS-NUMERO(07) * 07) +
+                  (WS-NUMERO(08) * 06) +
+                  (WS-NUMERO(09) * 05) +
+                  (WS-NUMERO(10) * 04) +
+                  (WS-NUMERO(11) * 03) +
+                  (WS-NUMERO(12) * 02)).
+      *
+           DIVIDE  WS-SOMA     BY   11
+                   GIVING      TALLY
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   WS-DIGITO-1
+           ELSE
+             COMPUTE   WS-DIGITO-1   =   11   -   WS-RESTO
+           END-IF.
+      *
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 06) +
+                  (WS-NUMERO(02) * 05) +
+                  (WS-NUMERO(03) * 04) +
+                  (WS-NUMERO(04) * 03) +
+                  (WS-NUMERO(05) * 02) +
+                  (WS-NUMERO(06) * 09) +
+                  (WS-NUMERO(07) * 08) +
+                  (WS-NUMERO(08) * 07) +
+                  (WS-NUMERO(09) * 06) +
+                  (WS-NUMERO(10) * 05) +
+                  (WS-NUMERO(11) * 04) +
+                  (WS-NUMERO(12) * 03) +
+                  (WS-DIGITO-1   * 02)).
+      *
+           DIVIDE  WS-SOMA     BY   11
+                   GIVING      TALLY
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+              MOVE   ZEROS   TO   WS-DIGITO-2
+           ELSE
+             COMPUTE   WS-DIGITO-2   =   11   -   WS-RESTO
+           END-IF.
+      *
+           MOVE   WS-DIGITO   TO   RUCLS-DV-CGC.
+      *
+      *----------------------------------------------------------------*
+	      103N-FIM.   EXIT.
+      *----------------------------------------------------------------*
+       103X0-CONS-ALFA.
+      *----------------------------------------------------------------*
+      *
+            MOVE     ZEROS      TO   WS-CH-CNPJ
+      *
+            MOVE     RUCLS-NU-CGC-BAS-ALFA  TO  WS-CALCULO-ALFA
+	
+            PERFORM  103X1-NUM-ALFA   THRU    103X1-FIM
+                     VARYING WS-IND1   FROM   1   BY   1
+                     UNTIL   WS-IND1   GREATER   08
+	
+            MOVE     RUCLS-NU-CGC-ORD-ALFA  TO  WS-CALCULO-ALFA
+
+            PERFORM  103X2-FIL-ALFA   THRU    103X2-FIM
+                     VARYING WS-IND1   FROM   1   BY   1
+                     UNTIL   WS-IND1   GREATER   04.
+
+      *     IF    WS-CH-CNPJ  NOT EQUAL ZEROS
+      *           MOVE  'RUC N 012 CNPJ INVALIDOS'
+      *                              TO   M041MSGO
+      *                                   M042MSGO
+	     *     END-IF.
+       103X0-FIM.  EXIT.
+	     *
+      *------------------------------------------------------------
+       103X1-NUM-ALFA.
+      *----------------------------------------------------------------*
+	     *
+      *
+           MOVE WS-NUMERO-ALFA(WS-IND1)  TO WS-CNPJ-ALFANUMERICO.
+
+           IF   NOT WS-CNPJ-ALFA AND  NOT WS-CNPJ-NUM
+                MOVE 9  TO      WS-CH-CNPJ
+           END-IF.
+      *
+	     *
+       103X1-FIM.  EXIT.
+	     *
+      *------------------------------------------------------------
+       103X2-FIL-ALFA.
+      *----------------------------------------------------------------*
+      *
+      *
+           MOVE WS-NUMERO-ALFA(WS-IND1)  TO WS-CNPJ-ALFANUMERICO.
+
+           IF   NOT WS-CNPJ-ALFA AND  NOT WS-CNPJ-NUM
+                MOVE 9  TO      WS-CH-CNPJ
+           END-IF.
+	     *
+       103X2-FIM.  EXIT.
+      *
+      *------------------------------------------------------------
+ 	     103A-DV-CGC-ALFA.
+      *----------------------------------------------------------------*
+	
+           MOVE     RUCLS-CGC-CALCULO      TO    WS-CALCULO-ALFA
+            MOVE    ZEROS    TO  WS-SOMA-ALFA.
+		
+		         PERFORM  103A1-PESQ-PRIM-DIG   THRU   103A1-FIM
+		                  VARYING WS-IND1   FROM   1   BY   1
+                    UNTIL   WS-IND1   GREATER   12.
+      *
+           DIVIDE  WS-SOMA-ALFA  BY   11
+                   GIVING      TALLY
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   WS-DIGITO-1
+           ELSE
+             COMPUTE   WS-DIGITO-1   =   11   -   WS-RESTO
+           END-IF.
+      *
+           MOVE     ZEROS   TO   WS-SOMA-ALFA.
+
+		         PERFORM  103A2-PESQ-SEG-DIG    THRU   103A2-FIM
+		                  VARYING WS-IND1   FROM   1   BY   1
+                    UNTIL   WS-IND1   GREATER   13
+					        AFTER
+		                  WS-IND2   FROM   1   BY   1
+                    UNTIL   WS-IND2   GREATER   36.
+      *
+           DIVIDE  WS-SOMA-ALFA   BY   11
+                   GIVING      TALLY
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+              MOVE   ZEROS   TO   WS-DIGITO-2
+           ELSE
+             COMPUTE   WS-DIGITO-2   =   11   -   WS-RESTO
+           END-IF.
+      *
+           MOVE   WS-DIGITO   TO   RUCLS-DV-CGC.
+
+	
+	      103A-FIM.   EXIT.
+      *----------------------------------------------------------------*
+	      103A1-PESQ-PRIM-DIG.
+      *----------------------------------------------------------------*
+      *
+
+		         PERFORM  103AX-PESQ-PRIM-ASCII THRU   103AX-FIM
+					        VARYING WS-IND2   FROM   1   BY   1
+		                   UNTIL   WS-IND2   GREATER   36.
+      *
+	      103A1-FIM.   EXIT.
+
+      *----------------------------------------------------------------*
+       103AX-PESQ-PRIM-ASCII.
+      *----------------------------------------------------------------*
+      *
+		         IF   WS-IND1 = 01
+		           IF WS-NUMERO-ALFA(01)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 5))
+                MOVE  36    TO   WS-IND2
+             END-IF
+           END-IF.
+					
+		         IF   WS-IND1 = 02
+		           IF WS-NUMERO-ALFA(02)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 4))
+                MOVE  36    TO   WS-IND2
+             END-IF
+           END-IF.
+
+		         IF   WS-IND1 = 03
+		           IF WS-NUMERO-ALFA(03)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 3))
+                MOVE  36    TO   WS-IND2
+             END-IF
+           END-IF.
+
+		         IF   WS-IND1 = 04
+		           IF WS-NUMERO-ALFA(04) EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 2))
+                MOVE  36    TO   WS-IND2
+             END-IF
+           END-IF.
+
+		
+		         IF   WS-IND1 = 05
+		          IF  WS-NUMERO-ALFA(05)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 9))
+                MOVE  36    TO   WS-IND2
+             END-IF
+           END-IF.
+
+
+		         IF   WS-IND1 = 06
+		          IF  WS-NUMERO-ALFA(06)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 8))
+                MOVE  36    TO   WS-IND2
+             END-IF
+           END-IF.
+
+		
+		         IF   WS-IND1 = 07
+	 		        IF  WS-NUMERO-ALFA(07)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 7))
+                MOVE  36    TO   WS-IND2
+             END-IF
+           END-IF.
+
+
+		         IF   WS-IND1 = 08
+		          IF  WS-NUMERO-ALFA(08)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 6))
+                MOVE  36    TO   WS-IND2
+             END-IF
+           END-IF.
+
+	
+		         IF   WS-IND1 = 09
+		          IF  WS-NUMERO-ALFA(09)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 5))
+                MOVE  36    TO   WS-IND2
+             END-IF
+           END-IF.
+
+		
+		         IF   WS-IND1 = 10
+		          IF  WS-NUMERO-ALFA(10)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 4))
+                MOVE  36    TO   WS-IND2
+             END-IF
+           END-IF.
+
+		
+		         IF   WS-IND1 = 11
+		          IF  WS-NUMERO-ALFA(11)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 3))
+                MOVE  36    TO   WS-IND2
+             END-IF
+           END-IF.
+
+		
+		         IF   WS-IND1 = 12
+		          IF  WS-NUMERO-ALFA(12)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 2))
+                MOVE  36    TO   WS-IND2
+             END-IF
+           END-IF.
+
+					
+       103AX-FIM.   EXIT.
+	
+      *----------------------------------------------------------------*
+	      103A2-PESQ-SEG-DIG.
+      *----------------------------------------------------------------*
+	
+
+		         IF   WS-IND1 = 01
+		          IF  WS-NUMERO-ALFA(01)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 6))
+                MOVE  36    TO   WS-IND2
+		          END-IF
+					      END-IF.
+		
+		         IF   WS-IND1 = 02
+		          IF  WS-NUMERO-ALFA(02)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 5))
+                MOVE  36    TO   WS-IND2
+		          END-IF
+					      END-IF.
+		
+		         IF   WS-IND1 = 03
+		          IF  WS-NUMERO-ALFA(03)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 4))
+                MOVE  36    TO   WS-IND2
+		          END-IF
+					      END-IF.
+		
+		         IF   WS-IND1 = 04
+		           IF  WS-NUMERO-ALFA(04)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 3))
+                MOVE  36    TO   WS-IND2
+		           END-IF
+					      END-IF.
+		
+		
+		         IF   WS-IND1 = 05
+		          IF  WS-NUMERO-ALFA(05)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 2))
+                MOVE  36    TO   WS-IND2
+		          END-IF
+					      END-IF.
+		
+		         IF   WS-IND1 = 06
+		          IF  WS-NUMERO-ALFA(06)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 9))
+                MOVE  36    TO   WS-IND2
+		          END-IF
+					      END-IF.
+		
+		         IF   WS-IND1 = 07
+		          IF  WS-NUMERO-ALFA(07)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 8))
+                MOVE  36    TO   WS-IND2
+		          END-IF
+					      END-IF.
+		
+		         IF   WS-IND1 = 08
+		          IF  WS-NUMERO-ALFA(08)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 7))
+                MOVE  36    TO   WS-IND2
+		          END-IF
+					      END-IF.
+					
+		         IF   WS-IND1 = 09
+		          IF  WS-NUMERO-ALFA(09)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 6))
+                MOVE  36    TO   WS-IND2
+		          END-IF
+					      END-IF.
+		
+		         IF   WS-IND1 = 10
+		          IF  WS-NUMERO-ALFA(10)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 5))
+                MOVE  36    TO   WS-IND2
+		          END-IF
+					      END-IF.
+		
+		         IF   WS-IND1 = 11
+		          IF  WS-NUMERO-ALFA(11)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 4))
+                MOVE  36    TO   WS-IND2
+		          END-IF
+					      END-IF.
+		
+		         IF   WS-IND1 = 12
+		          IF  WS-NUMERO-ALFA(12)  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 3))
+                MOVE  36    TO   WS-IND2
+		          END-IF
+					      END-IF.
+					
+		         IF   WS-IND1 = 13
+		          IF  WS-DIGITO-1  EQUAL WS-ASCII(WS-IND2)
+		              COMPUTE WS-SOMA-ALFA =
+		                (WS-SOMA-ALFA + ((WS-ASCII-VALO(WS-IND2) - 48) * 2))
+                MOVE  36    TO   WS-IND2
+		          END-IF
+					      END-IF.
+					
+					
+	      103A2-FIM.   EXIT.
+      *
+      *----------------------------------------------------------------*
+       104-DV-PONTO-VENDA.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-CGC-UNIDADE   IS NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           MOVE   RUCLS-UNIDADE   TO   WS-CALCULO
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 05) +
+                  (WS-NUMERO(02) * 04) +
+                  (WS-NUMERO(03) * 03) +
+                  (WS-NUMERO(04) * 02)).
+      *
+           DIVIDE  WS-SOMA     BY   11
+                   GIVING      WS-SOMA
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   RUCLS-DV-UNIDADE
+           ELSE
+             COMPUTE   RUCLS-DV-UNIDADE   =   11   -   WS-RESTO
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       104-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       105-DV-PIS.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-PIS   IS   NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           MOVE   RUCLS-PIS   TO   WS-CALCULO.
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 03) +
+                  (WS-NUMERO(02) * 02) +
+                  (WS-NUMERO(03) * 09) +
+                  (WS-NUMERO(04) * 08) +
+                  (WS-NUMERO(05) * 07) +
+                  (WS-NUMERO(06) * 06) +
+                  (WS-NUMERO(07) * 05) +
+                  (WS-NUMERO(08) * 04) +
+                  (WS-NUMERO(09) * 03) +
+                  (WS-NUMERO(10) * 02)).
+      *
+           DIVIDE  WS-SOMA     BY   11
+                   GIVING      WS-SOMA
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   RUCLS-DV-PIS
+           ELSE
+             COMPUTE   RUCLS-DV-PIS   =   11   -   WS-RESTO
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       105-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       106-DV-EMPRESA-FGTS.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-EMPRESA   IS NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           MOVE   RUCLS-EMPRESA   TO   WS-CALCULO.
+           IF ( ( WS-NUMERO(07) EQUAL ZEROS ) AND
+                ( WS-NUMERO(08) EQUAL ZEROS ) AND
+                ( WS-NUMERO(09) EQUAL ZEROS ) )
+             PERFORM   106-01-TRATA-PESO1   THRU   106-01-FIM
+           ELSE
+             PERFORM   106-02-TRATA-PESO2   THRU   106-02-FIM
+           END-IF.
+      *
+           DIVIDE  WS-SOMA     BY   11
+                   GIVING      WS-SOMA
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   RUCLS-DV-EMPRESA
+           ELSE
+             COMPUTE   RUCLS-DV-EMPRESA   =   11   -   WS-RESTO
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       106-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       106-01-TRATA-PESO1.
+      *----------------------------------------------------------------*
+      *
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 03) +
+                  (WS-NUMERO(02) * 02) +
+                  (WS-NUMERO(03) * 09) +
+                  (WS-NUMERO(04) * 08) +
+                  (WS-NUMERO(05) * 07) +
+                  (WS-NUMERO(06) * 06) +
+                  (WS-NUMERO(07) * 00) +
+                  (WS-NUMERO(08) * 00) +
+                  (WS-NUMERO(09) * 00) +
+                  (WS-NUMERO(10) * 05) +
+                  (WS-NUMERO(11) * 04) +
+                  (WS-NUMERO(12) * 03) +
+                  (WS-NUMERO(13) * 02)).
+      *
+      *----------------------------------------------------------------*
+       106-01-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       106-02-TRATA-PESO2.
+      *----------------------------------------------------------------*
+      *
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 06) +
+                  (WS-NUMERO(02) * 05) +
+                  (WS-NUMERO(03) * 04) +
+                  (WS-NUMERO(04) * 03) +
+                  (WS-NUMERO(05) * 02) +
+                  (WS-NUMERO(06) * 09) +
+                  (WS-NUMERO(07) * 08) +
+                  (WS-NUMERO(08) * 07) +
+                  (WS-NUMERO(09) * 06) +
+                  (WS-NUMERO(10) * 05) +
+                  (WS-NUMERO(11) * 04) +
+                  (WS-NUMERO(12) * 03) +
+                  (WS-NUMERO(13) * 02)).
+      *
+      *----------------------------------------------------------------*
+       106-02-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       107-DV-EMPREGADO.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-EMPREGADO-CALCULO   IS   NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           MOVE   RUCLS-EMPREGADO   TO   WS-CALCULO-LONGO.
+           PERFORM   107-00-ESCOLHE-PESO   THRU   107-00-FIM.
+      *
+           MOVE   ZEROS   TO   WS-SOMA
+      *
+           PERFORM   VARYING   WS-IND   FROM   1   BY   1
+             UNTIL   WS-IND   GREATER   23
+             COMPUTE WS-SOMA = WS-SOMA +
+                             ( WS-DIG-LONGO( WS-IND ) *
+                               WS-BYTE-PESO( WS-IND-PESO , WS-IND ) )
+           END-PERFORM.
+      *
+           DIVIDE  WS-SOMA     BY   11
+                   GIVING      WS-SOMA
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   WS-DIGITO-1
+           ELSE
+             COMPUTE   WS-DIGITO-1  =  11  -  WS-RESTO
+           END-IF.
+      *
+           ADD   4   TO   WS-IND-PESO
+      *
+           MOVE   WS-DIGITO-1   TO   WS-DIG-LONGO(24)
+      *
+           MOVE   ZEROS   TO   WS-SOMA.
+      *
+           PERFORM   VARYING   WS-IND   FROM  1  BY  1
+             UNTIL WS-IND GREATER 24
+             COMPUTE WS-SOMA = WS-SOMA +
+                             ( WS-DIG-LONGO( WS-IND ) *
+                               WS-BYTE-PESO( WS-IND-PESO , WS-IND ) )
+           END-PERFORM.
+      *
+           DIVIDE  WS-SOMA      BY    11
+                   GIVING      WS-SOMA
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   WS-DIGITO-2
+           ELSE
+             COMPUTE   WS-DIGITO-2    =   11   -   WS-RESTO
+           END-IF.
+      *
+           MOVE   WS-DIGITO   TO   RUCLS-DV-EMPREGADO.
+      *
+      *----------------------------------------------------------------*
+       107-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       107-00-ESCOLHE-PESO.
+      *----------------------------------------------------------------*
+      *
+           IF ( WS-DIG-LONGO(07) EQUAL ZEROS ) AND
+              ( WS-DIG-LONGO(08) EQUAL ZEROS ) AND
+              ( WS-DIG-LONGO(09) EQUAL ZEROS ) AND
+              ( WS-DIG-LONGO(15) EQUAL ZEROS ) AND
+              ( WS-DIG-LONGO(16) EQUAL ZEROS ) AND
+              ( WS-DIG-LONGO(17) EQUAL ZEROS ) AND
+              ( WS-DIG-LONGO(18) EQUAL ZEROS )
+              MOVE   4   TO   WS-IND-PESO
+           ELSE
+             IF ( WS-DIG-LONGO(07) EQUAL ZEROS ) AND
+                ( WS-DIG-LONGO(08) EQUAL ZEROS ) AND
+                ( WS-DIG-LONGO(09) EQUAL ZEROS )
+                MOVE   3   TO   WS-IND-PESO
+             ELSE
+               IF ( WS-DIG-LONGO(15) EQUAL ZEROS ) AND
+                  ( WS-DIG-LONGO(16) EQUAL ZEROS ) AND
+                  ( WS-DIG-LONGO(17) EQUAL ZEROS ) AND
+                  ( WS-DIG-LONGO(18) EQUAL ZEROS )
+                  MOVE   2   TO   WS-IND-PESO
+               ELSE
+                  MOVE   1   TO   WS-IND-PESO
+               END-IF
+             END-IF
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       107-00-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       108-DV-CHEQUE.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-CHEQUE   IS NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           MOVE   RUCLS-CHEQUE   TO   WS-CALCULO
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 07) +
+                  (WS-NUMERO(02) * 06) +
+                  (WS-NUMERO(03) * 05) +
+                  (WS-NUMERO(04) * 04) +
+                  (WS-NUMERO(05) * 03) +
+                  (WS-NUMERO(06) * 02)).
+      *
+           DIVIDE  WS-SOMA     BY   11
+                   GIVING      WS-SOMA
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   RUCLS-DV-CHEQUE
+           ELSE
+             COMPUTE   RUCLS-DV-CHEQUE   =   11   -   WS-RESTO
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       108-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       109-DV-INATIVA.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-INATIVA   IS NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           MOVE   ZEROS   TO   WS-DIGITO
+      *
+           MOVE   RUCLS-NU-INATIVA   TO   WS-CALCULO.
+           COMPUTE   WS-INAT-CALC = ( WS-NUMERO( 10 ) * 02 ).
+           COMPUTE   WS-DIGITO  =  WS-DIGITO  +  WS-INAT-1 + WS-INAT-2.
+      *
+           COMPUTE WS-INAT-CALC = ( WS-NUMERO( 11 ) * 01).
+           COMPUTE WS-DIGITO    =  WS-DIGITO   +
+                                   WS-INAT-1 + WS-INAT-2.
+           COMPUTE WS-INAT-CALC = ( WS-NUMERO( 12 ) * 02).
+           COMPUTE WS-DIGITO    =  WS-DIGITO      +
+                                   WS-INAT-1 + WS-INAT-2.
+           COMPUTE WS-INAT-CALC = ( WS-NUMERO( 13 ) * 01).
+           COMPUTE WS-DIGITO    =  WS-DIGITO      +
+                                   WS-INAT-1 + WS-INAT-2.
+           COMPUTE WS-INAT-CALC = ( WS-NUMERO( 14 ) * 02).
+           COMPUTE WS-DIGITO    =  WS-DIGITO      +
+                                   WS-INAT-1 + WS-INAT-2.
+           COMPUTE WS-INAT-CALC = ( WS-NUMERO( 15 ) * 01).
+           COMPUTE WS-DIGITO    =  WS-DIGITO      +
+                                   WS-INAT-1 + WS-INAT-2.
+           COMPUTE WS-INAT-CALC = ( WS-NUMERO( 16 ) * 02).
+           COMPUTE WS-DIGITO    =  WS-DIGITO      +
+                                   WS-INAT-1 + WS-INAT-2.
+           COMPUTE WS-INAT-CALC = ( WS-NUMERO( 17 ) * 01).
+           COMPUTE WS-DIGITO    =  WS-DIGITO      +
+                                   WS-INAT-1 + WS-INAT-2.
+           COMPUTE WS-INAT-CALC = ( WS-NUMERO( 18 ) * 02).
+           COMPUTE WS-DIGITO    =  WS-DIGITO      +
+                                   WS-INAT-1 + WS-INAT-2.
+      *
+           IF   WS-DIGITO-2   EQUAL   ZEROS
+             COMPUTE   RUCLS-DV-INATIVA   =   0
+           ELSE
+             COMPUTE   RUCLS-DV-INATIVA   =  10  -  WS-DIGITO-2
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       109-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       110-DV-SIAPI.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-SIAPI-CALCULO   IS NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           MOVE   RUCLS-SIAPI   TO   WS-CALCULO
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 09) +
+                  (WS-NUMERO(02) * 08) +
+                  (WS-NUMERO(03) * 07) +
+                  (WS-NUMERO(04) * 06) +
+                  (WS-NUMERO(05) * 05) +
+                  (WS-NUMERO(06) * 04) +
+                  (WS-NUMERO(07) * 03) +
+                  (WS-NUMERO(08) * 02) +
+                  (WS-NUMERO(09) * 09) +
+                  (WS-NUMERO(10) * 08) +
+                  (WS-NUMERO(11) * 07) +
+                  (WS-NUMERO(12) * 06) +
+                  (WS-NUMERO(13) * 05) +
+                  (WS-NUMERO(14) * 04) +
+                  (WS-NUMERO(15) * 03) +
+                  (WS-NUMERO(16) * 02)).
+      *
+           DIVIDE  WS-SOMA     BY   11
+                   GIVING      TALLY
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   WS-DIGITO-1
+           ELSE
+             COMPUTE   WS-DIGITO-1   =   11   -   WS-RESTO
+           END-IF.
+      *
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 02) +
+                  (WS-NUMERO(02) * 09) +
+                  (WS-NUMERO(03) * 08) +
+                  (WS-NUMERO(04) * 07) +
+                  (WS-NUMERO(05) * 06) +
+                  (WS-NUMERO(06) * 05) +
+                  (WS-NUMERO(07) * 04) +
+                  (WS-NUMERO(08) * 03) +
+                  (WS-NUMERO(09) * 02) +
+                  (WS-NUMERO(10) * 09) +
+                  (WS-NUMERO(11) * 08) +
+                  (WS-NUMERO(12) * 07) +
+                  (WS-NUMERO(13) * 06) +
+                  (WS-NUMERO(14) * 05) +
+                  (WS-NUMERO(15) * 04) +
+                  (WS-NUMERO(16) * 03) +
+                  (WS-DIGITO-1   * 02)).
+      *
+           DIVIDE  WS-SOMA     BY    11
+                   GIVING      TALLY
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO  WS-DIGITO-2
+           ELSE
+             COMPUTE   WS-DIGITO-2   =   11   -   WS-RESTO
+           END-IF
+           MOVE   WS-DIGITO   TO   RUCLS-DV-SIAPI.
+      *
+      *----------------------------------------------------------------*
+       110-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       111-DV-EVENTO.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-EVENTO   IS NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           MOVE   RUCLS-EVENTO   TO   WS-CALCULO.
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 05) +
+                  (WS-NUMERO(02) * 04) +
+                  (WS-NUMERO(03) * 03) +
+                  (WS-NUMERO(04) * 02)).
+      *
+           DIVIDE  WS-SOMA     BY   11
+                   GIVING      WS-SOMA
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   RUCLS-DV-EVENTO
+           ELSE
+             COMPUTE   RUCLS-DV-EVENTO   =   11   -   WS-RESTO
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       111-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       112-DV-CEI.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-CEI   IS   NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           MOVE   RUCLS-CEI   TO   WS-CALCULO.
+           COMPUTE WS-SOMA-CEI =
+                 ((WS-NUMERO(01) * 7) +
+                  (WS-NUMERO(02) * 4) +
+                   WS-NUMERO(03)      +
+                  (WS-NUMERO(04) * 8) +
+                  (WS-NUMERO(05) * 5) +
+                  (WS-NUMERO(06) * 2) +
+                   WS-NUMERO(07)      +
+                  (WS-NUMERO(08) * 6) +
+                  (WS-NUMERO(09) * 3) +
+                  (WS-NUMERO(10) * 7) +
+                  (WS-NUMERO(11) * 4)).
+      *
+           MOVE   WS-SOMA-CEI   TO   WS-ACUM-AUX-CEI
+      *
+           COMPUTE   WS-RESTO-CEI   =
+             WS-ACUM-CALC2-CEI  +  WS-ACUM-CALC3-CEI
+      *
+           COMPUTE   RUCLS-DV-CEI   =   10  -  WS-UNIDADE-CEI.
+      *
+      *----------------------------------------------------------------*
+       112-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       113-DV-BENEFICIO.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-BENEFICIO   IS NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           MOVE   RUCLS-BENEFICIO    TO   WS-CALCULO.
+           COMPUTE   WS-SOMA   =
+                   ((WS-NUMERO(01) * 2) +
+                    (WS-NUMERO(02) * 9) +
+                    (WS-NUMERO(03) * 8) +
+                    (WS-NUMERO(04) * 7) +
+                    (WS-NUMERO(05) * 6) +
+                    (WS-NUMERO(06) * 5) +
+                    (WS-NUMERO(07) * 4) +
+                    (WS-NUMERO(08) * 3) +
+                    (WS-NUMERO(09) * 2)).
+      *
+            DIVIDE  WS-SOMA     BY   11
+                    GIVING      WS-SOMA
+                    REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   RUCLS-DV-BENEFICIO
+           ELSE
+             COMPUTE   RUCLS-DV-BENEFICIO   =   11   -   WS-RESTO
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       113-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       114-DV-LOTERICO.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-LOTERICO   IS NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           MOVE   RUCLS-LOTERICO   TO   WS-CALCULO.
+           COMPUTE   WS-SOMA    =
+                   ((WS-NUMERO(01) * 09) +
+                    (WS-NUMERO(02) * 08) +
+                    (WS-NUMERO(03) * 07) +
+                    (WS-NUMERO(04) * 06) +
+                    (WS-NUMERO(05) * 05) +
+                    (WS-NUMERO(06) * 04) +
+                    (WS-NUMERO(07) * 03) +
+                    (WS-NUMERO(08) * 02)).
+      *
+           DIVIDE  WS-SOMA     BY   11
+                   GIVING      WS-SOMA
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   RUCLS-DV-LOTERICO
+           ELSE
+             COMPUTE   RUCLS-DV-LOTERICO   =   11   -   WS-RESTO
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       114-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       115-DV-GENERICO.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-GENERICO   IS NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           IF   RUCLS-ACAO   EQUAL   18
+             MOVE   RUCLS-DV-RESTO-ZERO   TO   WS-NUMERICO
+             IF   NOT   WS-VALUE-NUMERICO
+               MOVE   02   TO   RUCLS-CODIGO-RETORNO
+               PERFORM   900-ERROR
+             END-IF
+           END-IF
+      *
+           MOVE   RUCLS-NU-GENERICO   TO   WS-CALCULO-LONGO.
+           COMPUTE WS-SOMA =
+                 ((WS-DIG-LONGO(01) * 09) +
+                  (WS-DIG-LONGO(02) * 08) +
+                  (WS-DIG-LONGO(03) * 07) +
+                  (WS-DIG-LONGO(04) * 06) +
+                  (WS-DIG-LONGO(05) * 05) +
+                  (WS-DIG-LONGO(06) * 04) +
+                  (WS-DIG-LONGO(07) * 03) +
+                  (WS-DIG-LONGO(08) * 02) +
+                  (WS-DIG-LONGO(09) * 09) +
+                  (WS-DIG-LONGO(10) * 08) +
+                  (WS-DIG-LONGO(11) * 07) +
+                  (WS-DIG-LONGO(12) * 06) +
+                  (WS-DIG-LONGO(13) * 05) +
+                  (WS-DIG-LONGO(14) * 04) +
+                  (WS-DIG-LONGO(15) * 03) +
+                  (WS-DIG-LONGO(16) * 02) +
+                  (WS-DIG-LONGO(17) * 09) +
+                  (WS-DIG-LONGO(18) * 08) +
+                  (WS-DIG-LONGO(19) * 07) +
+                  (WS-DIG-LONGO(20) * 06) +
+                  (WS-DIG-LONGO(21) * 05) +
+                  (WS-DIG-LONGO(22) * 04) +
+                  (WS-DIG-LONGO(23) * 03) +
+                  (WS-DIG-LONGO(24) * 02)).
+      *
+           DIVIDE  WS-SOMA     BY    11
+                   GIVING      TALLY
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             IF   RUCLS-ACAO   EQUAL   18   AND
+               WS-RESTO   EQUAL   ZEROS
+               MOVE   RUCLS-DV-RESTO-ZERO   TO   RUCLS-DV-GENERICO
+             ELSE
+               MOVE   ZEROS   TO   RUCLS-DV-GENERICO
+             END-IF
+           ELSE
+             COMPUTE   RUCLS-DV-GENERICO   =   11  -  WS-RESTO
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       115-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       116-DV-DEBITO.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-CARTAO-DEBITO   NOT  NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           MOVE   RUCLS-CARTAO-DEBITO(1:1)    TO   WS-TIPO-CARTAO.
+      *
+VCAD       IF     WS-TIPO-CARTAO    EQUAL   ZEROS
+V012  *           MOVE RUCLS-CARTAO-DEBITO(7:1)    TO WS-TIPO-CARTAO
+V012              MOVE RUCLS-CARTAO-DEBITO(4:1)    TO WS-TIPO-CARTAO
+VCAD       END-IF
+      *
+           IF   WS-TIPO-CARTAO   EQUAL   6
+             PERFORM   116-01-MAESTRO   THRU   116-01-FIM
+           ELSE
+             IF   WS-TIPO-CARTAO   EQUAL   4 OR
+                  WS-TIPO-CARTAO   EQUAL   5
+               PERFORM   116-02-VISAELECTRON   THRU   116-02-FIM
+             ELSE
+               MOVE   02   TO   RUCLS-CODIGO-RETORNO
+               PERFORM   900-ERROR
+             END-IF
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       116-FIM.   EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       116-01-MAESTRO.
+      *----------------------------------------------------------------*
+      *
+      *    MOVE   RUCLS-CARTAO-DEBITO    TO   WS-CALCULO.
+           MOVE   RUCLS-CARTAO-DEBITO    TO   WS-CALC-INVER.
+           MOVE   ZEROS                  TO   WS-SOMA-DEBITO.
+      *
+           PERFORM  200-INVERTE        THRU   200-FIM.
+      *
+           PERFORM VARYING   WS-IND    FROM      1 BY 1
+                   UNTIL     WS-IND    GREATER   18
+                   DIVIDE    WS-IND    BY        2
+                   GIVING    TALLY     REMAINDER WS-RESTO-DEBITO
+             IF   WS-RESTO-DEBITO    EQUAL   ZEROS
+                  MOVE   1              TO   WS-PESO-DEBITO
+             ELSE
+                  MOVE   2              TO   WS-PESO-DEBITO
+             END-IF
+             COMPUTE   WS-PRODUTO-DEBITO    EQUAL
+               WS-NUMERO( WS-IND ) * WS-PESO-DEBITO
+             COMPUTE   WS-SOMA-DEBITO      EQUAL
+               WS-SOMA-DEBITO + WS-PROD1-DEBITO + WS-PROD2-DEBITO
+           END-PERFORM.
+      *
+           IF   WS-ACUM-CALC3-DEBITO  EQUAL   ZEROS
+                MOVE   0                 TO   RUCLS-DV-CARTAO-DEBITO
+           ELSE
+             COMPUTE   RUCLS-DV-CARTAO-DEBITO   =
+                      (10 - WS-ACUM-CALC3-DEBITO)
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       116-01-FIM.   EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       116-02-VISAELECTRON.
+      *----------------------------------------------------------------*
+      *
+           MOVE   RUCLS-CARTAO-DEBITO   TO   WS-CALCULO.
+           MOVE   ZEROS                 TO   WS-SOMA-DEBITO.
+      *
+           PERFORM VARYING   WS-IND    FROM        1   BY   1
+                   UNTIL     WS-IND    GREATER     18
+                   DIVIDE    WS-IND    BY          2
+                   GIVING    TALLY     REMAINDER   WS-RESTO-DEBITO
+             IF   WS-RESTO-DEBITO    EQUAL   ZEROS
+               MOVE   2                 TO   WS-PESO-DEBITO
+             ELSE
+               MOVE   1                 TO   WS-PESO-DEBITO
+             END-IF
+      *
+             COMPUTE
+                 WS-PRODUTO-DEBITO EQUAL
+                 WS-NUMERO( WS-IND )   *   WS-PESO-DEBITO
+      *
+             COMPUTE  WS-SOMA-DEBITO  EQUAL  WS-SOMA-DEBITO +
+                                             WS-PROD1-DEBITO +
+                                             WS-PROD2-DEBITO
+           END-PERFORM.
+      *
+           DIVIDE  WS-SOMA-DEBITO  BY   10
+                           GIVING     TALLY
+                           REMAINDER  WS-RESTO.
+      *
+           IF   WS-RESTO          EQUAL   ZEROS
+                MOVE   ZEROS         TO   RUCLS-DV-CARTAO-DEBITO
+           ELSE
+                COMPUTE  RUCLS-DV-CARTAO-DEBITO  =  10  -  WS-RESTO
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       116-02-FIM.   EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       117-DV-REMESSA.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-REMESSA   NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF.
+      *
+           MOVE    RUCLS-REMESSA-REGISTRADA TO   WS-CALCULO.
+      *
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 08) +
+                  (WS-NUMERO(02) * 06) +
+                  (WS-NUMERO(03) * 04) +
+                  (WS-NUMERO(04) * 02) +
+                  (WS-NUMERO(05) * 03) +
+                  (WS-NUMERO(06) * 05) +
+                  (WS-NUMERO(07) * 09) +
+                  (WS-NUMERO(08) * 07)).
+      *
+           DIVIDE  WS-SOMA   BY  11    GIVING    TALLY
+                                       REMAINDER WS-RESTO.
+      *
+           IF   WS-RESTO   EQUAL   0
+             MOVE   5   TO   RUCLS-DV-REMESSA
+           ELSE
+             IF   WS-RESTO   EQUAL   1
+               MOVE  0   TO   RUCLS-DV-REMESSA
+             ELSE
+               COMPUTE   RUCLS-DV-REMESSA    =   11 - WS-RESTO
+             END-IF
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       117-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       119-DV-CARTAO.
+      *----------------------------------------------------------------*
+      *
+           MOVE   RUCLS-CARTAO(1:1)   TO   WS-TIPO-CARTAO.
+      *
+           IF   WS-TIPO-CARTAO   NOT NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM 900-ERROR
+           END-IF.
+      *
+           IF   WS-TIPO-CARTAO   EQUAL   3
+             PERFORM   119-02-DINNERS   THRU   119-02-FIM
+           ELSE
+             IF   WS-TIPO-CARTAO   EQUAL   4   OR   5  OR  6
+               PERFORM   119-01-VISA-MASTERCARD   THRU   119-01-FIM
+             ELSE
+               MOVE   02   TO   RUCLS-CODIGO-RETORNO
+               PERFORM   900-ERROR
+             END-IF
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       119-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       119-01-VISA-MASTERCARD.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-CARTAO  OF  RUCLS-VISA-MASTERCARD
+                NOT NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF.
+      *
+           MOVE    RUCLS-CARTAO   TO   WS-CALCULO.
+      *
+      *    COMPUTE WS-SOMA =
+      *          ((WS-NUMERO(05) * 05) +
+      *           (WS-NUMERO(06) * 04) +
+      *           (WS-NUMERO(07) * 03) +
+      *           (WS-NUMERO(08) * 02) +
+      *           (WS-NUMERO(09) * 07) +
+      *           (WS-NUMERO(10) * 06) +
+      *           (WS-NUMERO(11) * 05) +
+      *           (WS-NUMERO(12) * 04) +
+      *           (WS-NUMERO(13) * 03) +
+      *           (WS-NUMERO(14) * 02)).
+      *
+      *    DIVIDE  WS-SOMA   BY  11    GIVING    TALLY
+      *                                REMAINDER WS-RESTO.
+      *
+      *    IF   WS-RESTO   LESS   2
+      *      MOVE   ZEROS   TO   WS-DIGITO-1
+      *    ELSE
+      *      COMPUTE   WS-DIGITO-1   =   11   -   WS-RESTO
+      *    END-IF.
+      *
+           COMPUTE   WS-DUAS-CASAS(01) =   (WS-NUMERO(01) * 02)
+           COMPUTE   WS-DUAS-CASAS(02) =   (WS-NUMERO(02) * 01)
+           COMPUTE   WS-DUAS-CASAS(03) =   (WS-NUMERO(03) * 02)
+           COMPUTE   WS-DUAS-CASAS(04) =   (WS-NUMERO(04) * 01)
+           COMPUTE   WS-DUAS-CASAS(05) =   (WS-NUMERO(05) * 02)
+           COMPUTE   WS-DUAS-CASAS(06) =   (WS-NUMERO(06) * 01)
+           COMPUTE   WS-DUAS-CASAS(07) =   (WS-NUMERO(07) * 02)
+           COMPUTE   WS-DUAS-CASAS(08) =   (WS-NUMERO(08) * 01)
+           COMPUTE   WS-DUAS-CASAS(09) =   (WS-NUMERO(09) * 02)
+           COMPUTE   WS-DUAS-CASAS(10) =   (WS-NUMERO(10) * 01)
+           COMPUTE   WS-DUAS-CASAS(11) =   (WS-NUMERO(11) * 02)
+           COMPUTE   WS-DUAS-CASAS(12) =   (WS-NUMERO(12) * 01)
+           COMPUTE   WS-DUAS-CASAS(13) =   (WS-NUMERO(13) * 02)
+           COMPUTE   WS-DUAS-CASAS(14) =   (WS-NUMERO(14) * 01)
+           COMPUTE   WS-DUAS-CASAS(15) =   (WS-NUMERO(15) * 02)
+      *** ALTERACAO EFETUADA EM 11/05/2006
+      *    COMPUTE   WS-DUAS-CASAS(15) =   (WS-DIGITO-1   * 02)
+      *
+           MOVE   ZEROS   TO   WS-SOMA
+           PERFORM   VARYING   WS-IND  FROM  1   BY   1
+                     UNTIL   WS-IND = 16
+              COMPUTE   WS-SOMA   =   WS-SOMA   +
+                 WS-CASA-1(WS-IND)   +   WS-CASA-2(WS-IND)
+           END-PERFORM.
+      *
+           DIVIDE  WS-SOMA     BY   10
+                   GIVING      TALLY
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   1
+             MOVE   ZEROS   TO   WS-DIGITO-2
+           ELSE
+             COMPUTE   WS-DIGITO-2   =   10   -   WS-RESTO
+           END-IF.
+      *
+           MOVE   WS-DIGITO   TO   RUCLS-DV-CARTAO   OF
+                  RUCLS-VISA-MASTERCARD.
+      *
+      *----------------------------------------------------------------*
+       119-01-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       119-02-DINNERS.
+      *----------------------------------------------------------------*
+      *
+      *
+           IF   RUCLS-NU-CARTAO  OF  RUCLS-DINNERS
+                NOT NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF.
+      *
+           MOVE   RUCLS-CARTAO   TO   WS-CALCULO.
+      *
+           COMPUTE   WS-DUAS-CASAS(01) =   (WS-NUMERO(01) * 02)
+           COMPUTE   WS-DUAS-CASAS(02) =   (WS-NUMERO(02) * 01)
+           COMPUTE   WS-DUAS-CASAS(03) =   (WS-NUMERO(03) * 02)
+           COMPUTE   WS-DUAS-CASAS(04) =   (WS-NUMERO(04) * 01)
+           COMPUTE   WS-DUAS-CASAS(05) =   (WS-NUMERO(05) * 02)
+           COMPUTE   WS-DUAS-CASAS(06) =   (WS-NUMERO(06) * 01)
+           COMPUTE   WS-DUAS-CASAS(07) =   (WS-NUMERO(07) * 02)
+           COMPUTE   WS-DUAS-CASAS(08) =   (WS-NUMERO(08) * 01)
+           COMPUTE   WS-DUAS-CASAS(09) =   (WS-NUMERO(09) * 02)
+           COMPUTE   WS-DUAS-CASAS(10) =   (WS-NUMERO(10) * 01)
+           COMPUTE   WS-DUAS-CASAS(11) =   (WS-NUMERO(11) * 02)
+           COMPUTE   WS-DUAS-CASAS(12) =   (WS-NUMERO(12) * 01)
+           COMPUTE   WS-DUAS-CASAS(13) =   (WS-NUMERO(13) * 02)
+      *
+           MOVE   ZEROS   TO   WS-SOMA
+           PERFORM   VARYING   WS-IND  FROM  1   BY   1
+                     UNTIL   WS-IND = 14
+              COMPUTE   WS-SOMA   =   WS-SOMA   +
+                 WS-CASA-1(WS-IND)   +   WS-CASA-2(WS-IND)
+           END-PERFORM.
+      *
+           DIVIDE  WS-SOMA   BY  10    GIVING    TALLY
+                                       REMAINDER WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   1
+             MOVE   ZEROS   TO   RUCLS-DV-CARTAO  OF  RUCLS-DINNERS
+           ELSE
+             COMPUTE   RUCLS-DV-CARTAO  OF  RUCLS-DINNERS   =
+                       10   -   WS-RESTO
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       119-02-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       120-DV-CONSTRUCARD.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-CONTRATO-CALCULO  OF  RUCLS-CONSTRUCARD
+                NOT NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF.
+      *
+           IF   RUCLS-CO-OPERACAO-C  OF  RUCLS-CONSTRUCARD
+VRS013*         NOT EQUAL   160   AND   260   AND   167   AND   697
+VRS013          NOT EQUAL   160 AND 260 AND 167 AND 168 AND 697
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF.
+      *
+           MOVE   RUCLS-CONSTRUCARD   TO   WS-CALCULO.
+      *
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 07) +
+                  (WS-NUMERO(02) * 06) +
+                  (WS-NUMERO(03) * 05) +
+                  (WS-NUMERO(04) * 04) +
+                  (WS-NUMERO(05) * 03) +
+                  (WS-NUMERO(06) * 02) +
+                  (WS-NUMERO(07) * 09) +
+                  (WS-NUMERO(08) * 08) +
+                  (WS-NUMERO(09) * 07) +
+                  (WS-NUMERO(10) * 06) +
+                  (WS-NUMERO(11) * 05) +
+                  (WS-NUMERO(12) * 04) +
+                  (WS-NUMERO(13) * 03) +
+                  (WS-NUMERO(14) * 02)).
+      *
+           COMPUTE   WS-CALC-CONSTRUCARD   =
+                  (( WS-SOMA  *  10  )  +  1 ) /  11.
+      *
+           MOVE   WS-DIGITO-CONSTRUCARD   TO   WS-DIGITO-1.
+      *
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 08) +
+                  (WS-NUMERO(02) * 07) +
+                  (WS-NUMERO(03) * 06) +
+                  (WS-NUMERO(04) * 05) +
+                  (WS-NUMERO(05) * 04) +
+                  (WS-NUMERO(06) * 03) +
+                  (WS-NUMERO(07) * 02) +
+                  (WS-NUMERO(08) * 09) +
+                  (WS-NUMERO(09) * 08) +
+                  (WS-NUMERO(10) * 07) +
+                  (WS-NUMERO(11) * 06) +
+                  (WS-NUMERO(12) * 05) +
+                  (WS-NUMERO(13) * 04) +
+                  (WS-NUMERO(14) * 03) +
+                  (WS-DIGITO-1   * 02)).
+      *
+           COMPUTE   WS-CALC-CONSTRUCARD   =
+                  (( WS-SOMA  *  10  )  +  1 ) /  11.
+      *
+           MOVE   WS-DIGITO-CONSTRUCARD   TO   WS-DIGITO-2.
+      *
+           MOVE   WS-DIGITOS   TO   RUCLS-DV-CONTRATO.
+      *
+      *----------------------------------------------------------------*
+       120-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       121-DV-GENERICO-EX.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-GENERICO-EX   IS NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           IF   RUCLS-ACAO   EQUAL   22
+             MOVE   RUCLS-DV-RESTO-ZERO-EX   TO   WS-NUMERICO
+             IF   NOT   WS-VALUE-NUMERICO
+               MOVE   02   TO   RUCLS-CODIGO-RETORNO
+               PERFORM   900-ERROR
+             END-IF
+           END-IF
+      *
+           MOVE   RUCLS-NU-GENERICO-EX   TO   WS-CALCULO-EXTENDIDO.
+           COMPUTE WS-SOMA =
+                 ((WS-DIG-EX(01) * 06) +
+                  (WS-DIG-EX(02) * 05) +
+                  (WS-DIG-EX(03) * 04) +
+                  (WS-DIG-EX(04) * 03) +
+                  (WS-DIG-EX(05) * 02) +
+                  (WS-DIG-EX(06) * 09) +
+                  (WS-DIG-EX(07) * 08) +
+                  (WS-DIG-EX(08) * 07) +
+                  (WS-DIG-EX(09) * 06) +
+                  (WS-DIG-EX(10) * 05) +
+                  (WS-DIG-EX(11) * 04) +
+                  (WS-DIG-EX(12) * 03) +
+                  (WS-DIG-EX(13) * 02) +
+                  (WS-DIG-EX(14) * 09) +
+                  (WS-DIG-EX(15) * 08) +
+                  (WS-DIG-EX(16) * 07) +
+                  (WS-DIG-EX(17) * 06) +
+                  (WS-DIG-EX(18) * 05) +
+                  (WS-DIG-EX(19) * 04) +
+                  (WS-DIG-EX(20) * 03) +
+                  (WS-DIG-EX(21) * 02) +
+                  (WS-DIG-EX(22) * 09) +
+                  (WS-DIG-EX(23) * 08) +
+                  (WS-DIG-EX(24) * 07) +
+                  (WS-DIG-EX(25) * 06) +
+                  (WS-DIG-EX(26) * 05) +
+                  (WS-DIG-EX(27) * 04) +
+                  (WS-DIG-EX(28) * 03) +
+                  (WS-DIG-EX(29) * 02) +
+                  (WS-DIG-EX(30) * 09) +
+                  (WS-DIG-EX(31) * 08) +
+                  (WS-DIG-EX(32) * 07) +
+                  (WS-DIG-EX(33) * 06) +
+                  (WS-DIG-EX(34) * 05) +
+                  (WS-DIG-EX(35) * 04) +
+                  (WS-DIG-EX(36) * 03) +
+                  (WS-DIG-EX(37) * 02) +
+                  (WS-DIG-EX(38) * 09) +
+                  (WS-DIG-EX(39) * 08) +
+                  (WS-DIG-EX(40) * 07) +
+                  (WS-DIG-EX(41) * 06) +
+                  (WS-DIG-EX(42) * 05) +
+                  (WS-DIG-EX(43) * 04) +
+                  (WS-DIG-EX(44) * 03) +
+                  (WS-DIG-EX(45) * 02)).
+      *
+           DIVIDE  WS-SOMA     BY    11
+                   GIVING      TALLY
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             IF   RUCLS-ACAO   EQUAL   22   AND
+               WS-RESTO   EQUAL   ZEROS
+               MOVE   RUCLS-DV-RESTO-ZERO-EX   TO   RUCLS-DV-GENERICO-EX
+             ELSE
+               IF   RUCLS-ACAO   EQUAL   23
+      *  ANTES   MOVE   1   TO   RUCLS-DV-GENERICO-EX
+      * ALTERACAO EFETUADA DE ACORDO COM A NORMA FEBRABAN
+                 MOVE   0   TO   RUCLS-DV-GENERICO-EX
+               ELSE
+                 MOVE   ZEROS   TO   RUCLS-DV-GENERICO-EX
+               END-IF
+             END-IF
+           ELSE
+             COMPUTE   RUCLS-DV-GENERICO-EX   =   11  -  WS-RESTO
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       121-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+VRS014 124-DV-BOLETO-43.
+VRS014*----------------------------------------------------------------*
+VRS014*
+VRS014     IF   RUCLS-NU-BOLETO43      IS NOT   NUMERIC
+VRS014       MOVE   02   TO   RUCLS-CODIGO-RETORNO
+VRS014       PERFORM   900-ERROR
+VRS014     END-IF
+VRS014*
+VRS014     MOVE   RUCLS-NU-BOLETO43      TO   WS-CALCULO-BOLETO43.
+VRS014     COMPUTE WS-SOMA =
+VRS014           ((WS-DIG-43(01) * 04) +
+VRS014            (WS-DIG-43(02) * 03) +
+VRS014            (WS-DIG-43(03) * 02) +
+VRS014            (WS-DIG-43(04) * 09) +
+VRS014            (WS-DIG-43(05) * 08) +
+VRS014            (WS-DIG-43(06) * 07) +
+VRS014            (WS-DIG-43(07) * 06) +
+VRS014            (WS-DIG-43(08) * 05) +
+VRS014            (WS-DIG-43(09) * 04) +
+VRS014            (WS-DIG-43(10) * 03) +
+VRS014            (WS-DIG-43(11) * 02) +
+VRS014            (WS-DIG-43(12) * 09) +
+VRS014            (WS-DIG-43(13) * 08) +
+VRS014            (WS-DIG-43(14) * 07) +
+VRS014            (WS-DIG-43(15) * 06) +
+VRS014            (WS-DIG-43(16) * 05) +
+VRS014            (WS-DIG-43(17) * 04) +
+VRS014            (WS-DIG-43(18) * 03) +
+VRS014            (WS-DIG-43(19) * 02) +
+VRS014            (WS-DIG-43(20) * 09) +
+VRS014            (WS-DIG-43(21) * 08) +
+VRS014            (WS-DIG-43(22) * 07) +
+VRS014            (WS-DIG-43(23) * 06) +
+VRS014            (WS-DIG-43(24) * 05) +
+VRS014            (WS-DIG-43(25) * 04) +
+VRS014            (WS-DIG-43(26) * 03) +
+VRS014            (WS-DIG-43(27) * 02) +
+VRS014            (WS-DIG-43(28) * 09) +
+VRS014            (WS-DIG-43(29) * 08) +
+VRS014            (WS-DIG-43(30) * 07) +
+VRS014            (WS-DIG-43(31) * 06) +
+VRS014            (WS-DIG-43(32) * 05) +
+VRS014            (WS-DIG-43(33) * 04) +
+VRS014            (WS-DIG-43(34) * 03) +
+VRS014            (WS-DIG-43(35) * 02) +
+VRS014            (WS-DIG-43(36) * 09) +
+VRSO14            (WS-DIG-43(37) * 08) +
+VRSO14            (WS-DIG-43(38) * 07) +
+VRS014            (WS-DIG-43(39) * 06) +
+VRS014            (WS-DIG-43(40) * 05) +
+VRS014            (WS-DIG-43(41) * 04) +
+VRS014            (WS-DIG-43(42) * 03) +
+VRS014            (WS-DIG-43(43) * 02)).
+VRS014*
+VRS014     DIVIDE  WS-SOMA     BY    11
+VRS014             GIVING      TALLY
+VRS014             REMAINDER   WS-RESTO.
+VRS014*
+VRS014     COMPUTE   WS-DV-BOLETO-43   =   11  -  WS-RESTO
+VRS014*
+VRS014     IF   WS-DV-BOLETO-43       EQUAL   ZEROS  OR
+VRS014          WS-DV-BOLETO-43       EQUAL   01     OR
+VRS014          WS-DV-BOLETO-43     GREATER   09
+VRS014          MOVE   1                 TO   RUCLS-DV-BOLETO43
+VRS014     ELSE
+VRS014          MOVE   WS-DV-BOLETO-43   TO   RUCLS-DV-BOLETO43
+VRS014     END-IF.
+VRS014*
+VRS014*----------------------------------------------------------------*
+VRS014 124-FIM. EXIT.
+VRS014*----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       125-DV-IPTU.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-IPTU       IS NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           MOVE   RUCLS-NU-IPTU       TO   WS-CALCULO-LONGO.
+           COMPUTE WS-SOMA =
+                 ((WS-DIG-LONGO(01) * 04) +
+                  (WS-DIG-LONGO(02) * 03) +
+                  (WS-DIG-LONGO(03) * 02) +
+                  (WS-DIG-LONGO(04) * 01) +
+                  (WS-DIG-LONGO(05) * 10) +
+                  (WS-DIG-LONGO(06) * 09) +
+                  (WS-DIG-LONGO(07) * 08) +
+                  (WS-DIG-LONGO(08) * 07) +
+                  (WS-DIG-LONGO(09) * 06) +
+                  (WS-DIG-LONGO(10) * 05) +
+                  (WS-DIG-LONGO(11) * 04) +
+                  (WS-DIG-LONGO(12) * 03) +
+                  (WS-DIG-LONGO(13) * 02) +
+                  (WS-DIG-LONGO(14) * 01) +
+                  (WS-DIG-LONGO(15) * 10) +
+                  (WS-DIG-LONGO(16) * 09) +
+                  (WS-DIG-LONGO(17) * 08) +
+                  (WS-DIG-LONGO(18) * 07) +
+                  (WS-DIG-LONGO(19) * 06) +
+                  (WS-DIG-LONGO(20) * 05) +
+                  (WS-DIG-LONGO(21) * 04) +
+                  (WS-DIG-LONGO(22) * 03) +
+                  (WS-DIG-LONGO(23) * 02)).
+      *
+           DIVIDE  WS-SOMA     BY    11
+                   GIVING      TALLY
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   WS-DIGITO-1
+           ELSE
+             COMPUTE   WS-DIGITO-1   =   11   -   WS-RESTO
+           END-IF.
+      *
+           MOVE   WS-DIGITO-1      TO  RUCLS-DV-IPTU-1.
+      *
+           MOVE   RUCLS-DV-IPTU-1  TO  WS-DIG-LONGO(24).
+      *
+           COMPUTE WS-SOMA =
+                 ((WS-DIG-LONGO(01) * 05) +
+                  (WS-DIG-LONGO(02) * 04) +
+                  (WS-DIG-LONGO(03) * 03) +
+                  (WS-DIG-LONGO(04) * 02) +
+                  (WS-DIG-LONGO(05) * 01) +
+                  (WS-DIG-LONGO(06) * 10) +
+                  (WS-DIG-LONGO(07) * 09) +
+                  (WS-DIG-LONGO(08) * 08) +
+                  (WS-DIG-LONGO(09) * 07) +
+                  (WS-DIG-LONGO(10) * 06) +
+                  (WS-DIG-LONGO(11) * 05) +
+                  (WS-DIG-LONGO(12) * 04) +
+                  (WS-DIG-LONGO(13) * 03) +
+                  (WS-DIG-LONGO(14) * 02) +
+                  (WS-DIG-LONGO(15) * 01) +
+                  (WS-DIG-LONGO(16) * 10) +
+                  (WS-DIG-LONGO(17) * 09) +
+                  (WS-DIG-LONGO(18) * 08) +
+                  (WS-DIG-LONGO(19) * 07) +
+                  (WS-DIG-LONGO(20) * 06) +
+                  (WS-DIG-LONGO(21) * 05) +
+                  (WS-DIG-LONGO(22) * 04) +
+                  (WS-DIG-LONGO(23) * 03) +
+                  (WS-DIG-LONGO(24) * 02)).
+      *
+           DIVIDE  WS-SOMA     BY    11
+                   GIVING      TALLY
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   WS-DIGITO-2
+           ELSE
+             COMPUTE   WS-DIGITO-2   =   11   -   WS-RESTO
+           END-IF.
+      *
+           MOVE   WS-DIGITO-2       TO   RUCLS-DV-IPTU-2.
+      *
+      *----------------------------------------------------------------*
+       125-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       126-DV-LIGHT.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-LIGHT IS  NOT   NUMERIC
+                MOVE   02   TO   RUCLS-CODIGO-RETORNO
+                PERFORM   900-ERROR
+           END-IF.
+      *
+           MOVE   RUCLS-LIGHT      TO   WS-CALCULO.
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 11) +
+                  (WS-NUMERO(02) * 10) +
+                  (WS-NUMERO(03) * 09) +
+                  (WS-NUMERO(04) * 08) +
+                  (WS-NUMERO(05) * 07) +
+                  (WS-NUMERO(06) * 06) +
+                  (WS-NUMERO(07) * 05) +
+                  (WS-NUMERO(08) * 04) +
+                  (WS-NUMERO(09) * 03) +
+                  (WS-NUMERO(10) * 02) +
+                  (WS-NUMERO(11) * 01)).
+      *
+           DIVIDE  WS-SOMA     BY   11
+                   GIVING      WS-SOMA
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO    EQUAL   1
+                MOVE   ZEROS   TO   RUCLS-DV-LIGHT
+           ELSE
+           IF   WS-RESTO    EQUAL   0
+                MOVE   1       TO   RUCLS-DV-LIGHT
+           ELSE
+                COMPUTE   RUCLS-DV-LIGHT   =   11   -   WS-RESTO
+           END-IF
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       126-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       127-DV-PARCELAMENTO-SEFAZ.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-REMESSA   NOT   NUMERIC
+                MOVE   02           TO   RUCLS-CODIGO-RETORNO
+                PERFORM   900-ERROR
+           END-IF.
+      *
+           MOVE   RUCLS-REMESSA-REGISTRADA TO   WS-CALCULO.
+      *
+VRS015     IF  RUCLS-ACAO          EQUAL   27
+               COMPUTE WS-SOMA =
+                     ((WS-NUMERO(01) * 08) +
+                      (WS-NUMERO(02) * 07) +
+                      (WS-NUMERO(03) * 06) +
+                      (WS-NUMERO(04) * 05) +
+                      (WS-NUMERO(05) * 04) +
+                      (WS-NUMERO(06) * 03) +
+                      (WS-NUMERO(07) * 02) +
+                      (WS-NUMERO(08) * 10))
+      *
+               DIVIDE  WS-SOMA   BY  11    GIVING    TALLY
+                                       REMAINDER WS-RESTO
+      *
+               COMPUTE   WS-DIGITO    =   11 - WS-RESTO
+      *
+               IF   WS-DIGITO         EQUAL   11
+                    MOVE   02            TO   RUCLS-CODIGO-RETORNO
+                    PERFORM   900-ERROR
+               ELSE
+                 IF   WS-DIGITO       EQUAL   10
+                      MOVE  0            TO   RUCLS-DV-REMESSA
+                 ELSE
+                   IF   WS-DIGITO      LESS  10
+                        MOVE  WS-DIGITO  TO   RUCLS-DV-REMESSA
+                   END-IF
+                 END-IF
+               END-IF
+           ELSE
+VRS015         COMPUTE WS-SOMA =
+VRS015               ((WS-NUMERO(01) * 09) +
+VRS015                (WS-NUMERO(02) * 08) +
+VRS015                (WS-NUMERO(03) * 07) +
+VRS015                (WS-NUMERO(04) * 06) +
+VRS015                (WS-NUMERO(05) * 05) +
+VRS015                (WS-NUMERO(06) * 04) +
+VRS015                (WS-NUMERO(07) * 03) +
+VRS015                (WS-NUMERO(08) * 02))
+VRS015*
+VRS015         DIVIDE  WS-SOMA   BY  11    GIVING    TALLY
+VRS015                                 REMAINDER WS-RESTO
+VRS015*
+VRS015         COMPUTE   WS-DIGITO    =   11 - WS-RESTO
+VRS015*
+VRS015         IF   WS-DIGITO         EQUAL   10   OR   11
+VRS015              MOVE  0              TO   RUCLS-DV-REMESSA
+VRS015         ELSE
+VRS015           IF   WS-DIGITO        LESS   10
+VRS015                MOVE  WS-DIGITO    TO   RUCLS-DV-REMESSA
+VRS015           END-IF
+               END-IF
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       127-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+VRS012 128-DV-CONTA-NSGD.
+VRS012*----------------------------------------------------------------*
+VRS012*
+VRS012     IF  RUCLS-CNTA-CALC-NSGD  IS NOT   NUMERIC
+VRS012       MOVE   02   TO   RUCLS-CODIGO-RETORNO
+VRS012       PERFORM   900-ERROR
+VRS012     END-IF
+VRS012*
+VRS012     MOVE  RUCLS-CNTA-CALC-NSGD  TO   WS-CALCULO.
+VRS012     COMPUTE WS-SOMA =
+VRS012           ((WS-NUMERO(01) * 05) +
+VRS012            (WS-NUMERO(02) * 04) +
+VRS012            (WS-NUMERO(03) * 03) +
+VRS012            (WS-NUMERO(04) * 02) +
+VRS012            (WS-NUMERO(05) * 09) +
+VRS012            (WS-NUMERO(06) * 08) +
+VRS012            (WS-NUMERO(07) * 07) +
+VRS012            (WS-NUMERO(08) * 06) +
+VRS012            (WS-NUMERO(09) * 05) +
+VRS012            (WS-NUMERO(10) * 04) +
+VRS012            (WS-NUMERO(11) * 03) +
+VRS012            (WS-NUMERO(12) * 02)).
+VRS012*
+VRS012     COMPUTE  WS-SOMA = WS-SOMA * 10.
+VRS012*
+VRS012     DIVIDE  WS-SOMA     BY   11
+VRS012             GIVING      WS-SOMA
+VRS012             REMAINDER   WS-RESTO.
+VRS012*
+VRS012     IF  WS-RESTO       EQUAL  10
+VRS012         MOVE  ZEROS       TO  RUCLS-DV-CNTA-NSGD
+VRS012     ELSE
+VRS012         MOVE  WS-RESTO    TO  RUCLS-DV-CNTA-NSGD
+VRS012     END-IF.
+VRS012*
+VRS012*----------------------------------------------------------------*
+VRS012 128-FIM. EXIT.
+VRS012*----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+VRS016 129-DV-PARTES-BOLETO43.
+VRS016*----------------------------------------------------------------*
+VRS016*
+VRS016     IF   RUCLS-NU-PIS          NOT  NUMERIC
+VRS016          MOVE   02              TO  RUCLS-CODIGO-RETORNO
+VRS016          PERFORM   900-ERROR
+VRS016     END-IF.
+VRS016*
+VRS016     MOVE   RUCLS-NU-PIS         TO  WS-CALCULO.
+VRS016*
+VRS016     COMPUTE   WS-DUAS-CASAS(01)  =  (WS-NUMERO(09) * 01)
+VRS016     COMPUTE   WS-DUAS-CASAS(02)  =  (WS-NUMERO(10) * 02)
+VRS016     COMPUTE   WS-DUAS-CASAS(03)  =  (WS-NUMERO(11) * 01)
+VRS016     COMPUTE   WS-DUAS-CASAS(04)  =  (WS-NUMERO(12) * 02)
+VRS016     COMPUTE   WS-DUAS-CASAS(05)  =  (WS-NUMERO(13) * 01)
+VRS016     COMPUTE   WS-DUAS-CASAS(06)  =  (WS-NUMERO(14) * 02)
+VRS016     COMPUTE   WS-DUAS-CASAS(07)  =  (WS-NUMERO(15) * 01)
+VRS016     COMPUTE   WS-DUAS-CASAS(08)  =  (WS-NUMERO(16) * 02)
+VRS016     COMPUTE   WS-DUAS-CASAS(09)  =  (WS-NUMERO(17) * 01)
+VRS016     COMPUTE   WS-DUAS-CASAS(10)  =  (WS-NUMERO(18) * 02)
+VRS016*
+VRS016     MOVE   ZEROS                TO  WS-SOMA
+VRS016     PERFORM VARYING  WS-IND   FROM  1 BY 1
+VRS016               UNTIL  WS-IND  EQUAL  11
+VRS016           COMPUTE   WS-SOMA    =    WS-SOMA   +
+VRS016                  WS-CASA-1(WS-IND)  +   WS-CASA-2(WS-IND)
+VRS016     END-PERFORM.
+VRS016*
+VRS016     DIVIDE  WS-SOMA BY 10  GIVING   TALLY
+VRS016                         REMAINDER   WS-RESTO
+VRS016*
+VRS016     IF  WS-RESTO            EQUAL   ZEROS
+VRS016         MOVE   ZEROS           TO   RUCLS-DV-PIS
+VRS016     ELSE
+VRS016      IF  WS-RESTO            LESS   10
+VRS016          COMPUTE  RUCLS-DV-PIS  =   10   -   WS-RESTO
+VRS016      END-IF
+VRS016     END-IF.
+VRS016*
+VRS016*----------------------------------------------------------------*
+VRS016 129-FIM. EXIT.
+VRS016*----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       131-DV-EVENTO-NOVO.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-EVENTO-NOVO   IS NOT   NUMERIC
+             MOVE   02   TO   RUCLS-CODIGO-RETORNO
+             PERFORM   900-ERROR
+           END-IF
+      *
+           MOVE   RUCLS-EVENTO-NOVO   TO   WS-CALCULO.
+           COMPUTE WS-SOMA =
+                 ((WS-NUMERO(01) * 06) +
+                  (WS-NUMERO(02) * 05) +
+                  (WS-NUMERO(03) * 04) +
+                  (WS-NUMERO(04) * 03) +
+                  (WS-NUMERO(05) * 02)).
+      *
+           DIVIDE  WS-SOMA     BY   11
+                   GIVING      WS-SOMA
+                   REMAINDER   WS-RESTO.
+      *
+           IF   WS-RESTO   LESS   2
+             MOVE   ZEROS   TO   RUCLS-DV-EVENTO-NOVO
+           ELSE
+             COMPUTE   RUCLS-DV-EVENTO-NOVO  =   11   -   WS-RESTO
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       131-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       132-DV-JCB.
+      *----------------------------------------------------------------*
+      *
+           IF   RUCLS-NU-JCB     IS NOT   NUMERIC
+                MOVE    02           TO   RUCLS-CODIGO-RETORNO
+                PERFORM              900-ERROR
+           END-IF
+      *
+      ***** FASE 1
+      ***** DOBRAR OS NUMEROS PARTINDO DO ULTIMO E PULANDO O
+      *     PROXIMO
+      *
+           MOVE   RUCLS-NU-JCB       TO   WS-CALC-JCB.
+      *
+           COMPUTE WS-DB-JCB(08) =  WS-NU-JCB(15) * 02
+           COMPUTE WS-DB-JCB(07) =  WS-NU-JCB(13) * 02
+           COMPUTE WS-DB-JCB(06) =  WS-NU-JCB(11) * 02
+           COMPUTE WS-DB-JCB(05) =  WS-NU-JCB(09) * 02
+           COMPUTE WS-DB-JCB(04) =  WS-NU-JCB(07) * 02
+           COMPUTE WS-DB-JCB(03) =  WS-NU-JCB(05) * 02
+           COMPUTE WS-DB-JCB(02) =  WS-NU-JCB(03) * 02
+           COMPUTE WS-DB-JCB(01) =  WS-NU-JCB(01) * 02
+      *
+      ***** FASE 2
+      ***** SOMAR OS DIGITOS DE CADA RESULTADO ACIMA ADICIONANDO
+      ***** O DIGITO SUBSEQUENTE E TOTALIZANDO-OS
+      *
+           MOVE    WS-DB-JCB(01)    TO     WS-SEPARA-JCB
+           COMPUTE WS-SOMA-JCB  =  WS-SOMA-JCB +  WS-SE-JCB1 +
+                                   WS-SE-JCB2  +  WS-NU-JCB(02)
+      *
+           MOVE    WS-DB-JCB(02)    TO     WS-SEPARA-JCB
+           COMPUTE WS-SOMA-JCB  =  WS-SOMA-JCB + WS-SE-JCB1  +
+                                   WS-SE-JCB2  + WS-NU-JCB(04)
+      *
+           MOVE    WS-DB-JCB(03)    TO     WS-SEPARA-JCB
+           COMPUTE WS-SOMA-JCB  =  WS-SOMA-JCB + WS-SE-JCB1  +
+                                   WS-SE-JCB2  + WS-NU-JCB(06)
+      *
+           MOVE    WS-DB-JCB(04)    TO     WS-SEPARA-JCB
+           COMPUTE WS-SOMA-JCB  =  WS-SOMA-JCB + WS-SE-JCB1  +
+                                   WS-SE-JCB2  + WS-NU-JCB(08)
+      *
+           MOVE    WS-DB-JCB(05)    TO     WS-SEPARA-JCB
+           COMPUTE WS-SOMA-JCB  =  WS-SOMA-JCB + WS-SE-JCB1  +
+                                   WS-SE-JCB2  + WS-NU-JCB(10)
+      *
+           MOVE    WS-DB-JCB(06)    TO     WS-SEPARA-JCB
+           COMPUTE WS-SOMA-JCB  =  WS-SOMA-JCB + WS-SE-JCB1  +
+                                   WS-SE-JCB2 + WS-NU-JCB(12)
+      *
+           MOVE    WS-DB-JCB(07)    TO     WS-SEPARA-JCB
+           COMPUTE WS-SOMA-JCB  =  WS-SOMA-JCB +  WS-SE-JCB1 +
+                                   WS-SE-JCB2  +  WS-NU-JCB(14)
+      *
+           MOVE    WS-DB-JCB(08)    TO     WS-SEPARA-JCB
+           COMPUTE WS-SOMA-JCB  =  WS-SOMA-JCB + WS-SE-JCB1 +
+                                   WS-SE-JCB2
+      *
+      ***** FASE 3
+      ***** VERIFICA SE O ULTIMO DIGITO DA SOMA È ZERO SE N„O FOR
+      ***** ACHA O DÌGITO
+      *
+           MOVE   WS-SOMA-JCB       TO     WS-SEPARA-SOMA
+      *
+           IF     WS-SE-SOMA3    EQUAL     ZEROS
+                  MOVE    ZEROS     TO     RUCLS-DV-JCB
+           ELSE
+                  PERFORM   132-001-DV-JCB   THRU   132-001-FIM
+                  UNTIL    WS-FIM-JCB   EQUAL   'S'
+           END-IF.
+      *
+      *----------------------------------------------------------------*
+       132-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *
+      *----------------------------------------------------------------*
+       132-001-DV-JCB.
+      *----------------------------------------------------------------*
+      *
+           ADD    1                     TO     WS-SOMA-JCB
+           ADD    1                     TO     WS-DIGITO-JCB.
+      *
+           MOVE   WS-SOMA-JCB           TO     WS-SEPARA-SOMA
+      *
+           IF     WS-SE-SOMA3        EQUAL     ZEROS
+                  MOVE   WS-DIGITO-JCB  TO     RUCLS-DV-JCB
+                  MOVE   'S'            TO     WS-FIM-JCB
+           END-IF.
+      *
+      *----------------------------------------------------------------
+       132-001-FIM. EXIT.
+      *----------------------------------------------------------------
+      *
+      *----------------------------------------------------------------*
+       200-INVERTE.
+      *----------------------------------------------------------------*
+      *
+           MOVE   WS-CALC-INVER (01:01)  TO   WS-CALCULO (18:01).
+           MOVE   WS-CALC-INVER (02:01)  TO   WS-CALCULO (17:01).
+           MOVE   WS-CALC-INVER (03:01)  TO   WS-CALCULO (16:01).
+           MOVE   WS-CALC-INVER (04:01)  TO   WS-CALCULO (15:01).
+           MOVE   WS-CALC-INVER (05:01)  TO   WS-CALCULO (14:01).
+           MOVE   WS-CALC-INVER (06:01)  TO   WS-CALCULO (13:01).
+           MOVE   WS-CALC-INVER (07:01)  TO   WS-CALCULO (12:01).
+           MOVE   WS-CALC-INVER (08:01)  TO   WS-CALCULO (11:01).
+           MOVE   WS-CALC-INVER (09:01)  TO   WS-CALCULO (10:01).
+           MOVE   WS-CALC-INVER (10:01)  TO   WS-CALCULO (09:01).
+           MOVE   WS-CALC-INVER (11:01)  TO   WS-CALCULO (08:01).
+           MOVE   WS-CALC-INVER (12:01)  TO   WS-CALCULO (07:01).
+           MOVE   WS-CALC-INVER (13:01)  TO   WS-CALCULO (06:01).
+           MOVE   WS-CALC-INVER (14:01)  TO   WS-CALCULO (05:01).
+           MOVE   WS-CALC-INVER (15:01)  TO   WS-CALCULO (04:01).
+           MOVE   WS-CALC-INVER (16:01)  TO   WS-CALCULO (03:01).
+           MOVE   WS-CALC-INVER (17:01)  TO   WS-CALCULO (02:01).
+           MOVE   WS-CALC-INVER (18:01)  TO   WS-CALCULO (01:01).
+
+      *
+      *----------------------------------------------------------------*
+       200-FIM. EXIT.
+      *----------------------------------------------------------------*
+      *----------------------------------------------------------------*
+       900-ERROR.
+      *----------------------------------------------------------------*
+      *
+           GOBACK.
+      *
+      *----------------------------------------------------------------*
+      *900-FIM. EXIT.
+      *----------------------------------------------------------------

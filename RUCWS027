@@ -1,0 +1,128 @@
+      *----------------------------------------------------------------*
+      *                                                                *
+      *                   R  U  C  W  S  0  2  7                       *
+      *                                                                *
+      *----------------------------------------------------------------*
+      *                                                                *
+      *      DEFINICAO DA AREA DE PASSAGEM DA ROTINA RUCBB027 PARA     *
+      *      CALCULO DA OPERACAO (PRODUTO)                             *
+      *                                                                *
+      ******************************************************************
+      *                                                                *
+      *  NOME AUTORA: PATRICIA HORTENZI                                *
+      *                                                                *
+      *----------------------------------------------------------------*
+      *            |                        |                          *
+      *            |      REGISTRO          |                          *
+      *  RUCWS027  |                        |                          *
+      *            |  TAMANHO 120 BYTES     |                          *
+      *            |                        |                          *
+      *----------------------------------------------------------------*
+      **----                     RUCWS027                         ----**
+      **--------------------------------------------------------------**
+      *                                                                *
+      *                                                                *
+      *  RUCWS-AMBIENTE                 (E) TIPO DE AMBIENTE           *
+      *                                     O - ONLINE                 *
+      *                                     B - BATCH                  *
+      *                                                                *
+      *                                                                *
+      *  RUCWS-CONTA-BB                 (E) NUMERO DA CONTA PARA A     *
+      *                                     QUAL SE DESEJA IDENTIFICAR *
+      *                                     A OPERACAO                 *
+      *                                                                *
+      *  RUCWS-NU-CGC-UNIDADE           (E) CGC DO PONTO DE VENDA      *
+      *                                     DETENTOR DA CONTA          *
+      *                                                                *
+      *  RUCWS-NU-CONTA                 (E) NUMERO DA CONTA NO FORMATO *
+      *                                     DO BANCO DO BRASIL         *
+      *                                     SEM OPERACAO               *
+      *                                                                *
+      *  RUCWS-NU-DV-CONTA              (E) NUMERO DO DV DA CONTA NO   *
+      *                                     FORMATO DO BANCO DO BRASIL *
+      *                                                                *
+      *----------------------------------------------------------------*
+      *                                                                *
+      *  RUCWS-CONTA-CEF                (S) NUMERO DA CONTA NO FORMATO *
+      *                                     DA CAIXA IDENTIFICADA      *
+      *                                                                *
+      *  RUCWS-NU-CGC-UNIDADE           (S) CGC DO PONTO DE VENDA      *
+      *                                     DETENTOR DA CONTA          *
+      *                                                                *
+      *  RUCWS-CO-PRODUTO               (S) CODIGO DO PRODUTO DA CONTA *
+      *                                                                *
+      *  RUCWS-NU-CONTA                 (S) NUMERO DA CONTA            *
+      *                                                                *
+      *  RUCWS-NU-DV-CONTA              (S) NUMERO DO DV DA CONTA      *
+      *                                                                *
+      *  RUCWS-CONTA-INVESTIMENTO       (S) FLAG QUE INDICA SE A       *
+      *                                     IDENTIFICACAO DEVE SER     *
+      *                                     FEITA COM O OBJETIVO DE    *
+      *                                     IDENTIFICAR UMA CONTA      *
+      *                                     INVESTIMENTO OU UMA CONTA  *
+      *                                     CONVENCIONAL               *
+      *                                     ("S") - IDENTIFICAR CONTA  *
+      *                                             INVESTIMENTO       *
+      *                                     ("N") - IDENTIFICAR CONTA  *
+      *                                             CONVENCIONAL       *
+      *                                                                *
+      *  RUCWS-RETORNO                      CODIGO DE RETORNO ONDE     *
+      *                                     "0" - FOI IDENTIFICADA UMA *
+      *                                     UNICA CONTA CUJO NUMERO    *
+      *                                     ESTA DISPONIVEL EM         *
+      *                                     RUCWS-CONTA-CEF            *
+      *                                     "1" - NAO FOI POSSIVEL     *
+      *                                     IDENTIFICAR NENHUMA CONTA  *
+      *                                     "2" - FORAM IDENTIFICADAS  *
+      *                                     MAIS DE UMA CONTA. NESTE   *
+      *                                     CASO OBTER A LISTA DE      *
+      *                                     CONTAS EM                  *
+      *                                     RUCWS-LISTA                *
+      *                                                                *
+      *  RUCWS-DENOTER                      DENOTER DO STATEMENT       *
+      *                                                                *
+      *----------------------------------------------------------------*
+      *                                                                *
+      *  RUCWS-LISTA                        GRUPO REPETITIVO CONTENDO  *
+      *                                     UMA LISTA COM TODAS AS     *
+      *                                     CONTAS IDENTIFICADAS       *
+      *                                                                *
+      *  RUCWS-QT-CONTAS                    QUANTIDADE DE CONTAS       *
+      *                                     EXISTENTES NO GRUPO        *
+      *                                     REPETITIVO                 *
+      *                                                                *
+      *  RUCWS-CONTAS                                                  *
+      *                                                                *
+      *    RUCWS-NU-CGC-UNIDADE         (S) CGC DO PONTO DE VENDA      *
+      *                                     DETENTOR DA CONTA          *
+      *                                                                *
+      *    RUCWS-CO-PRODUTO             (S) CODIGO DO PRODUTO DA CONTA *
+      *                                                                *
+      *    RUCWS-NU-CONTA               (S) NUMERO DA CONTA            *
+      *                                                                *
+      *    RUCWS-NU-DV-CONTA            (S) NUMERO DO DV DA CONTA      *
+      *                                                                *
+      *----------------------------------------------------------------*
+       01  :RUCWS:027.
+         03  :RUCWS:-AMBIENTE               PIC X(001) VALUE SPACES.
+         03  :RUCWS:-CONTA-BB.
+           05  :RUCWS:-NU-CGC-UNIDADE       PIC 9(004) VALUE ZEROS.
+           05  :RUCWS:-NU-CONTA             PIC 9(012) VALUE ZEROS.
+           05  :RUCWS:-NU-DV-CONTA          PIC X(001) VALUE SPACES.
+         03  :RUCWS:-CONTA-CEF.
+           05  :RUCWS:-NU-CGC-UNIDADE       PIC 9(004) VALUE ZEROS.
+           05  :RUCWS:-CO-PRODUTO           PIC 9(003) VALUE ZEROS.
+           05  :RUCWS:-NU-CONTA             PIC 9(008) VALUE ZEROS.
+           05  :RUCWS:-NU-DV-CONTA          PIC 9(001) VALUE ZEROS.
+         03  :RUCWS:-CONTA-INVESTIMENTO     PIC X(001) VALUE SPACES.
+         03  FILLER                         PIC X(031) VALUE SPACES.
+         03  :RUCWS:-RETORNO-EXECUCAO.
+           05  :RUCWS:-RETORNO              PIC 9(002) VALUE ZEROS.
+           05  :RUCWS:-DENOTER              PIC X(050) VALUE SPACES.
+         03  :RUCWS:-LISTA.
+           05  :RUCWS:-QT-CONTAS            PIC 9(002).
+           05  :RUCWS:-CONTAS               OCCURS 020 TIMES.
+             07  :RUCWS:-NU-CGC-UNIDADE     PIC 9(004).
+             07  :RUCWS:-CO-PRODUTO         PIC 9(003).
+             07  :RUCWS:-NU-CONTA           PIC 9(008).
+             07  :RUCWS:-NU-DV-CONTA        PIC 9(001).
